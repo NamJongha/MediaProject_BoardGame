@@ -27,5 +27,4 @@ Style: Role-and-Move, Party
 Idea Inspiration Game: Peak
 
 Concept:
-
 players become the conquerers of the newly found mountain. The first one who reaches the top will be the winner and conquer the mountain.
