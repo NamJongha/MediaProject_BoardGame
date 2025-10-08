@@ -1,6 +1,6 @@
 # Title
 
-MP_3D Multiplayer Board Game
+Toward The Top
 
 --------------------------------------------------
 
@@ -18,7 +18,7 @@ End: currently keep going
 --------------------------------------------------
 
 ## Description
-3D Multiplayer Board Game
+3D Multiplayer Board Game Project
 
 Style: Role-and-Move, Party
 
