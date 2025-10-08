@@ -1,4 +1,4 @@
-#Title
+# Title
 
 MP_3D Multiplayer Board Game
 
@@ -10,12 +10,14 @@ Unity3D(6000.X), Photon Fusion2
 
 --------------------------------------------------
 
-##Date
+## Date
 
 Start: 2025/09/01
 End: currently keep going
 
-##Description
+--------------------------------------------------
+
+## Description
 3D Multiplayer Board Game
 
 Style: Role-and-Move, Party
