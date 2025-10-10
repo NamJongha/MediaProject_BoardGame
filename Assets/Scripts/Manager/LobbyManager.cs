@@ -118,6 +118,14 @@ public class LobbyManager : MonoBehaviour
             Debug.Log("All the players should be logged in");
             return;
         }
+        foreach(var kvp in gameManager.GetPlayersList())
+        {
+            if (kvp.Value != null)
+            {
+                _runner.Despawn(kvp.Value);
+                Debug.Log("player " + kvp.Key + " is despawned");
+            }
+        }
         _runner.LoadScene("GameScene");
     }
 }

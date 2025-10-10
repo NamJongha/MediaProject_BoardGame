@@ -8,6 +8,8 @@ public class Player : NetworkBehaviour
 
     [Networked] public bool isReady { get; set; }
 
+    private int diceNum = 0;
+
     private ChangeDetector changeDetector;
 
     private void Awake()
@@ -54,6 +56,8 @@ public class Player : NetworkBehaviour
         }
     }
 
+
+    #region player ready in lobby
     public void ChangeReady()
     {
         if (Object.HasStateAuthority)
@@ -81,4 +85,18 @@ public class Player : NetworkBehaviour
             else isReady = false;
         }
     }
+    #endregion
+
+    #region player dice logic
+    public void RollTheDice()
+    {
+        int dice = Random.Range(1, 7);
+        diceNum = dice;
+    }
+
+    public int GetDiceNum()
+    {
+        return diceNum;
+    }
+#endregion
 }
