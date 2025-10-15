@@ -6,6 +6,7 @@ using System;
 using UnityEngine.SceneManagement;
 using System.Collections;
 using System.Linq;
+using static Unity.Collections.Unicode;
 
 public class GameManager : MonoBehaviour, INetworkRunnerCallbacks
 {
@@ -46,8 +47,26 @@ public class GameManager : MonoBehaviour, INetworkRunnerCallbacks
     private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
         Debug.Log("Scene loaded " + scene.name);
-        if(scene.name == "LobbyScene")
+
+        if(scene.name == "TitleScene")
         {
+            PlayerPrefs.SetString("currentScene", "TitleScene");
+            PlayerPrefs.Save();
+        }
+
+        else if(scene.name == "LobbyScene")
+        {
+            PlayerPrefs.SetString("currentScene", "LobbyScene");
+            PlayerPrefs.Save();
+            spawnPoints = GameObject.FindGameObjectsWithTag("SpawnPoint").OrderBy(spawnPoint => spawnPoint.name).ToArray();
+            StartCoroutine(StartAfterLoad());
+        }
+
+        else if(scene.name == "GameScene")
+        {
+            PlayerPrefs.SetString("currentScene", "GameScene");
+            PlayerPrefs.Save();
+            spawnPoints = new GameObject[4];
             spawnPoints = GameObject.FindGameObjectsWithTag("SpawnPoint").OrderBy(spawnPoint => spawnPoint.name).ToArray();
             StartCoroutine(StartAfterLoad());
         }
@@ -56,7 +75,11 @@ public class GameManager : MonoBehaviour, INetworkRunnerCallbacks
     private IEnumerator StartAfterLoad()
     {
         yield return null;
-        if (SceneManager.GetActiveScene().name == "LobbyScene")
+
+        string curSceneName = PlayerPrefs.GetString("currentScene");
+        Debug.Log("Current Scene: " + curSceneName);
+
+        if (curSceneName == "LobbyScene")
         {
             string sessionName = PlayerPrefs.GetString("sessionName");
             string gameMode = PlayerPrefs.GetString("gameMode");
@@ -64,6 +87,39 @@ public class GameManager : MonoBehaviour, INetworkRunnerCallbacks
             Debug.Log("sesion: " + sessionName);
 
             GameStarter(gameMode, sessionName);
+        }
+
+        else if(curSceneName == "GameScene")
+        {
+            if (_runner.IsServer)
+            {
+                _spawnedCharacters.Clear();
+
+                foreach (var player in _runner.ActivePlayers)
+                {
+
+                    Vector3 spawnPosition = new Vector3(0, 0, 0);
+                    for (int i = 0; i < 4; i++)
+                    {
+                        if (spawnPoints[i].GetComponent<SpawnPointChecker>().getSpawned())//if player is already spawned on that point
+                        {
+                            continue; //look for next spawn point
+                        }
+                        else
+                        {
+                            spawnPosition = spawnPoints[i].transform.position + new Vector3(0, 2.5f, 0);
+                            spawnPoints[i].GetComponent<SpawnPointChecker>().setSpawned();
+                            break;
+                        }
+                    }
+                    NetworkObject networkPlayerObject = _runner.Spawn(_playerPrefab, spawnPosition, Quaternion.identity, player); //매개변수 player: 아바타에 대한 입력 제공을 하는 플레이어
+
+                    networkPlayerObject.GetComponent<Player>().resetReady(); //reset joined player's ready state to false
+
+                    // Keep track of the player avatars for easy access
+                    _spawnedCharacters.Add(player, networkPlayerObject);
+                }
+            }
         }
     }
 
@@ -138,7 +194,8 @@ public class GameManager : MonoBehaviour, INetworkRunnerCallbacks
 
     public void OnDisconnectedFromServer(NetworkRunner runner, NetDisconnectReason reason)
     {
-        throw new NotImplementedException();
+        Debug.Log("Host is missing");
+        SceneManager.LoadScene("TitleScene");
     }
 
     public void OnHostMigration(NetworkRunner runner, HostMigrationToken hostMigrationToken)
@@ -248,7 +305,8 @@ public class GameManager : MonoBehaviour, INetworkRunnerCallbacks
 
     public void OnShutdown(NetworkRunner runner, ShutdownReason shutdownReason)
     {
-        throw new NotImplementedException();
+        Debug.Log(shutdownReason);
+        SceneManager.LoadScene("TitleScene");
     }
 
     public void OnUserSimulationMessage(NetworkRunner runner, SimulationMessagePtr message)
