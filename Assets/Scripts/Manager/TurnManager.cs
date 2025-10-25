@@ -6,23 +6,28 @@ using NUnit.Framework;
 using System.Collections.Generic;
 using System.Linq;
 
-public class TurnManager : MonoBehaviour
+public class TurnManager : NetworkBehaviour
 {
     [SerializeField] private Button turnDecideButton;
 
-    private NetworkArray<PlayerRef> PlayerOrder { get; }
+    [Networked, Capacity(4)] public NetworkArray<PlayerRef> PlayerOrder => default;
 
     private NetworkRunner _runner;
     private GameManager gameManager;
 
     private void Start()
     {
+
+    }
+
+    public override void Spawned()
+    {
+        base.Spawned();
+
+        turnDecideButton = FindFirstObjectByType<Button>();
         turnDecideButton.onClick.AddListener(OnDecideButtonClicked);
         _runner = FindFirstObjectByType<NetworkRunner>();
         gameManager = FindFirstObjectByType<GameManager>();
-
-        //need to be in scene loaded
-        ResetOrder();
     }
 
     private void OnDecideButtonClicked()
@@ -45,6 +50,7 @@ public class TurnManager : MonoBehaviour
             PlayerRef playerRef = kvp.Key;
             int dice = kvp.Value.GetComponent<Player>().GetDiceNum();
 
+            Debug.Log(playerRef + " player's dice number: " + dice);
             result.Add((playerRef, dice));
         }
 
@@ -52,11 +58,12 @@ public class TurnManager : MonoBehaviour
 
         for(int i = 0; i < _runner.ActivePlayers.Count(); i++)
         {
-            Debug.Log(i + " order player: " + result[i].player + " dice num: " + result[i].dice);
+            PlayerOrder.Set(i, result[i].player);
+            Debug.Log(i + " order player: " + PlayerOrder[i]);
         }
     }
 
-    private void ResetOrder()
+    public void ResetOrder()
     {
         PlayerOrder.Clear();
     }

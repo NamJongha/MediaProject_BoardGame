@@ -17,6 +17,9 @@ public class GameManager : MonoBehaviour, INetworkRunnerCallbacks
     [SerializeField]
     private NetworkPrefabRef _playerPrefab;
 
+    [SerializeField]
+    private GameObject turnManagerPrefab;
+
     private Dictionary<PlayerRef, NetworkObject> _spawnedCharacters = new(); //players in room
 
     private NetworkRunner _runner;
@@ -66,8 +69,11 @@ public class GameManager : MonoBehaviour, INetworkRunnerCallbacks
         {
             PlayerPrefs.SetString("currentScene", "GameScene");
             PlayerPrefs.Save();
+
             spawnPoints = new GameObject[4];
             spawnPoints = GameObject.FindGameObjectsWithTag("SpawnPoint").OrderBy(spawnPoint => spawnPoint.name).ToArray();
+
+            //spawn players
             StartCoroutine(StartAfterLoad());
         }
     }
@@ -119,6 +125,8 @@ public class GameManager : MonoBehaviour, INetworkRunnerCallbacks
                     // Keep track of the player avatars for easy access
                     _spawnedCharacters.Add(player, networkPlayerObject);
                 }
+
+                _runner.Spawn(turnManagerPrefab);
             }
         }
     }
@@ -290,12 +298,12 @@ public class GameManager : MonoBehaviour, INetworkRunnerCallbacks
     //maybe we can use this methods to show loading scene
     public void OnSceneLoadDone(NetworkRunner runner)
     {
-        throw new NotImplementedException();
+        Debug.Log("Scene Load Done");
     }
 
     public void OnSceneLoadStart(NetworkRunner runner)
     {
-        throw new NotImplementedException();
+        Debug.Log("Scene Load Start");
     }
 
     public void OnSessionListUpdated(NetworkRunner runner, List<SessionInfo> sessionList)

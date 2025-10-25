@@ -1247,7 +1247,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::StartButtonManager
   sessionNameText: {fileID: 1892425085}
-  FusionManager: {fileID: 0}
+  FusionManager: {fileID: 1357956004}
 --- !u!4 &1178807689
 Transform:
   m_ObjectHideFlags: 0
@@ -1295,6 +1295,7 @@ MonoBehaviour:
   peerCount: 3
   _playerPrefab:
     RawGuidValue: 0c4a14f46892fde4bbff87b48cd42161
+  turnManagerPrefab: {fileID: 8513619837263475380, guid: 6b4649622f710484b845da8fd3dc955a, type: 3}
   spawnPoints:
   - {fileID: 0}
   - {fileID: 0}
