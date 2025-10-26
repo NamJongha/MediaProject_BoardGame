@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 919f870cfed9caf4d8451facfaf162e5
+timeCreated: 1607863853
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 185045
+  packageName: Fantasy Environment Pack - Low Poly 3D Art
+  packageVersion: 1.0.3
+  assetPath: Assets/TARBO-FantasyEnvironment/Prefabs/Frozen/Ground-Tile/tarbo_Env_Frozen_Mt_C.prefab
+  uploadId: 561867

@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: aee4ec34bff3a274187365457769c25f
+timeCreated: 1607861554
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 185045
+  packageName: Fantasy Environment Pack - Low Poly 3D Art
+  packageVersion: 1.0.3
+  assetPath: Assets/TARBO-FantasyEnvironment/Prefabs/Forest_Elf/Ground-Hex/tarbo_Env_ForestElf_Hex_Ground_Pond.prefab
+  uploadId: 561867

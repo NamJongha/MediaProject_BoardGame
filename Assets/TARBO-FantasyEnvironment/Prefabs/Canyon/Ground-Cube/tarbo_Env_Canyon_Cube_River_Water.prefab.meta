@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: a349a0f672f7d664cbf3ccd3d6adced8
+timeCreated: 1607859828
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 185045
+  packageName: Fantasy Environment Pack - Low Poly 3D Art
+  packageVersion: 1.0.3
+  assetPath: Assets/TARBO-FantasyEnvironment/Prefabs/Canyon/Ground-Cube/tarbo_Env_Canyon_Cube_River_Water.prefab
+  uploadId: 561867

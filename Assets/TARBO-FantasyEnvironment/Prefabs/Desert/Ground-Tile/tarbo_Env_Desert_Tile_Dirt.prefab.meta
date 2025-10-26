@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: af309d4523417eb4487cac7711798da4
+timeCreated: 1607860995
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 185045
+  packageName: Fantasy Environment Pack - Low Poly 3D Art
+  packageVersion: 1.0.3
+  assetPath: Assets/TARBO-FantasyEnvironment/Prefabs/Desert/Ground-Tile/tarbo_Env_Desert_Tile_Dirt.prefab
+  uploadId: 561867

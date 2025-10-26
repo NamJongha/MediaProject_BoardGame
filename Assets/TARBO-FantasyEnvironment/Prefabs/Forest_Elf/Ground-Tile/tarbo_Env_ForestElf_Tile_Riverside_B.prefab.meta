@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: efb6bcb5ddba5ca4bbafa7f3edc92a0c
+timeCreated: 1607861693
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 185045
+  packageName: Fantasy Environment Pack - Low Poly 3D Art
+  packageVersion: 1.0.3
+  assetPath: Assets/TARBO-FantasyEnvironment/Prefabs/Forest_Elf/Ground-Tile/tarbo_Env_ForestElf_Tile_Riverside_B.prefab
+  uploadId: 561867

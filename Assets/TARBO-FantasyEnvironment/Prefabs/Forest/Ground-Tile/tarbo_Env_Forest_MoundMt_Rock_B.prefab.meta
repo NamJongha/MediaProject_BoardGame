@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 550d366efbd93b9439c1c2165c253cca
+timeCreated: 1607861314
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 185045
+  packageName: Fantasy Environment Pack - Low Poly 3D Art
+  packageVersion: 1.0.3
+  assetPath: Assets/TARBO-FantasyEnvironment/Prefabs/Forest/Ground-Tile/tarbo_Env_Forest_MoundMt_Rock_B.prefab
+  uploadId: 561867

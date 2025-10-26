@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 0a114a070e0cf0645ac57ee906c3232a
+timeCreated: 1607859678
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 185045
+  packageName: Fantasy Environment Pack - Low Poly 3D Art
+  packageVersion: 1.0.3
+  assetPath: Assets/TARBO-FantasyEnvironment/Prefabs/Canyon/Plant/tarbo_Env_Canyon_Cactus_H.prefab
+  uploadId: 561867

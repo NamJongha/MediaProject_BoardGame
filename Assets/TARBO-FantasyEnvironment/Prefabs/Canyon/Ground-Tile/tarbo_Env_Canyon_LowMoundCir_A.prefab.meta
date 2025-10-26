@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 55a140cb2c4a6bd46a3997962ed0208d
+timeCreated: 1607859966
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 185045
+  packageName: Fantasy Environment Pack - Low Poly 3D Art
+  packageVersion: 1.0.3
+  assetPath: Assets/TARBO-FantasyEnvironment/Prefabs/Canyon/Ground-Tile/tarbo_Env_Canyon_LowMoundCir_A.prefab
+  uploadId: 561867

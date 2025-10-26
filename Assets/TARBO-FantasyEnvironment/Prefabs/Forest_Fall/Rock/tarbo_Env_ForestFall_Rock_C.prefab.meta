@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 2179a1e07e1580746a1b865d4bece47e
+timeCreated: 1607862107
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 185045
+  packageName: Fantasy Environment Pack - Low Poly 3D Art
+  packageVersion: 1.0.3
+  assetPath: Assets/TARBO-FantasyEnvironment/Prefabs/Forest_Fall/Rock/tarbo_Env_ForestFall_Rock_C.prefab
+  uploadId: 561867

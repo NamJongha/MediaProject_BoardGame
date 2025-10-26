@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 6d47ab3ba5ad2194a9d59ed66d716ccf
+timeCreated: 1607860545
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 185045
+  packageName: Fantasy Environment Pack - Low Poly 3D Art
+  packageVersion: 1.0.3
+  assetPath: Assets/TARBO-FantasyEnvironment/Prefabs/Desert/Ground-Cube/tarbo_Env_Desert_Cube_Ground_D.prefab
+  uploadId: 561867

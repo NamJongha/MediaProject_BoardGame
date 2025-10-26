@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: d76f09ee2b655d648a0a1e2bf834d7ec
+timeCreated: 1607858620
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 185045
+  packageName: Fantasy Environment Pack - Low Poly 3D Art
+  packageVersion: 1.0.3
+  assetPath: Assets/TARBO-FantasyEnvironment/Materials/Tarbo-FantasyEnvironment.mat
+  uploadId: 561867

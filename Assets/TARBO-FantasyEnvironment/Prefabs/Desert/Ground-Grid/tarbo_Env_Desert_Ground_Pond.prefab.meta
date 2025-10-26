@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: fac3cc9a27e81d040833e6200d045e93
+timeCreated: 1607860740
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 185045
+  packageName: Fantasy Environment Pack - Low Poly 3D Art
+  packageVersion: 1.0.3
+  assetPath: Assets/TARBO-FantasyEnvironment/Prefabs/Desert/Ground-Grid/tarbo_Env_Desert_Ground_Pond.prefab
+  uploadId: 561867

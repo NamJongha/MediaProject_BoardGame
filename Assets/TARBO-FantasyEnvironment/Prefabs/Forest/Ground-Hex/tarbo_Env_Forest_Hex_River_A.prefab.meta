@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 6e7df28f9afb81e41bde501d7a4c1c88
+timeCreated: 1607861246
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 185045
+  packageName: Fantasy Environment Pack - Low Poly 3D Art
+  packageVersion: 1.0.3
+  assetPath: Assets/TARBO-FantasyEnvironment/Prefabs/Forest/Ground-Hex/tarbo_Env_Forest_Hex_River_A.prefab
+  uploadId: 561867

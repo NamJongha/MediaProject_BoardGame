@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 4e8b938ef6ac1af45a2306b0b44307bb
+timeCreated: 1607860302
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 185045
+  packageName: Fantasy Environment Pack - Low Poly 3D Art
+  packageVersion: 1.0.3
+  assetPath: Assets/TARBO-FantasyEnvironment/Prefabs/Cloud/tarbo_Env_CloudDark_B.prefab
+  uploadId: 561867

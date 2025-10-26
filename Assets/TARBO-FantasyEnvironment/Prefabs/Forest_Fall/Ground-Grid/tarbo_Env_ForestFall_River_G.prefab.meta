@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 4af25623c6d53234c983837c5ea1be7f
+timeCreated: 1607862089
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 185045
+  packageName: Fantasy Environment Pack - Low Poly 3D Art
+  packageVersion: 1.0.3
+  assetPath: Assets/TARBO-FantasyEnvironment/Prefabs/Forest_Fall/Ground-Grid/tarbo_Env_ForestFall_River_G.prefab
+  uploadId: 561867

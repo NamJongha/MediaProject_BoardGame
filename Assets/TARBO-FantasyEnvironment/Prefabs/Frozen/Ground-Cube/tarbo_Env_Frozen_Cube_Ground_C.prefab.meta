@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 4cffb7126da25cd46a42693c01e2ae59
+timeCreated: 1607863665
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 185045
+  packageName: Fantasy Environment Pack - Low Poly 3D Art
+  packageVersion: 1.0.3
+  assetPath: Assets/TARBO-FantasyEnvironment/Prefabs/Frozen/Ground-Cube/tarbo_Env_Frozen_Cube_Ground_C.prefab
+  uploadId: 561867

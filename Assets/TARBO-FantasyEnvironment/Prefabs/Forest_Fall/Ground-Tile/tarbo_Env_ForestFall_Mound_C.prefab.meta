@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: d84e5409c164a7640a7d75b91a8efaea
+timeCreated: 1607862000
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 185045
+  packageName: Fantasy Environment Pack - Low Poly 3D Art
+  packageVersion: 1.0.3
+  assetPath: Assets/TARBO-FantasyEnvironment/Prefabs/Forest_Fall/Ground-Tile/tarbo_Env_ForestFall_Mound_C.prefab
+  uploadId: 561867

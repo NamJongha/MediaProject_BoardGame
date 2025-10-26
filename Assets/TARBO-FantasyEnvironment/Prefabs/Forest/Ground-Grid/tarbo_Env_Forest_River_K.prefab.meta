@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 1f327bb9eb4e4d54a98fd26b1aa73210
+timeCreated: 1607861368
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 185045
+  packageName: Fantasy Environment Pack - Low Poly 3D Art
+  packageVersion: 1.0.3
+  assetPath: Assets/TARBO-FantasyEnvironment/Prefabs/Forest/Ground-Grid/tarbo_Env_Forest_River_K.prefab
+  uploadId: 561867

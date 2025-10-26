@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 9a1b87d0ba6c4be4c910c7b6e534bc3f
+timeCreated: 1607860578
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 185045
+  packageName: Fantasy Environment Pack - Low Poly 3D Art
+  packageVersion: 1.0.3
+  assetPath: Assets/TARBO-FantasyEnvironment/Prefabs/Desert/Ground-Cube/tarbo_Env_Desert_Cube_River_H.prefab
+  uploadId: 561867

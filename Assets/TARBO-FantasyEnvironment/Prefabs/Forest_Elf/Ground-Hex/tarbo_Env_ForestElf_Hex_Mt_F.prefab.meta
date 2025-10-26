@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 5b697e79abeda3e4f9e84542d5e3fbec
+timeCreated: 1607861566
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 185045
+  packageName: Fantasy Environment Pack - Low Poly 3D Art
+  packageVersion: 1.0.3
+  assetPath: Assets/TARBO-FantasyEnvironment/Prefabs/Forest_Elf/Ground-Hex/tarbo_Env_ForestElf_Hex_Mt_F.prefab
+  uploadId: 561867

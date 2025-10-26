@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 1c71a60c1e83520418f441fe46a528f1
+timeCreated: 1607864905
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 185045
+  packageName: Fantasy Environment Pack - Low Poly 3D Art
+  packageVersion: 1.0.3
+  assetPath: Assets/TARBO-FantasyEnvironment/Prefabs/Volcano/Ground-Cube/tarbo_Env_Volcano_Cube_River_A.prefab
+  uploadId: 561867

@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 7d378f314c27a5c439bb6a053356fe05
+timeCreated: 1607863772
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 185045
+  packageName: Fantasy Environment Pack - Low Poly 3D Art
+  packageVersion: 1.0.3
+  assetPath: Assets/TARBO-FantasyEnvironment/Prefabs/Frozen/Ground-Hex/tarbo_Env_Frozen_Hex_Mt_Snow_A.prefab
+  uploadId: 561867

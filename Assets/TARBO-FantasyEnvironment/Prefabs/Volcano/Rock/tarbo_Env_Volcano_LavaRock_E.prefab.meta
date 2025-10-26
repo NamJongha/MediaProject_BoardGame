@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: a261cb0e099ccc94d8e15e3ad7eaf2de
+timeCreated: 1607864998
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 185045
+  packageName: Fantasy Environment Pack - Low Poly 3D Art
+  packageVersion: 1.0.3
+  assetPath: Assets/TARBO-FantasyEnvironment/Prefabs/Volcano/Rock/tarbo_Env_Volcano_LavaRock_E.prefab
+  uploadId: 561867

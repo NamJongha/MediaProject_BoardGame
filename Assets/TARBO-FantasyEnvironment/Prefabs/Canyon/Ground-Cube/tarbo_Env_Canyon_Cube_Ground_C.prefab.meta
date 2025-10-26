@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 04731a70083041d419b69b5f6ac8fcae
+timeCreated: 1607859776
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 185045
+  packageName: Fantasy Environment Pack - Low Poly 3D Art
+  packageVersion: 1.0.3
+  assetPath: Assets/TARBO-FantasyEnvironment/Prefabs/Canyon/Ground-Cube/tarbo_Env_Canyon_Cube_Ground_C.prefab
+  uploadId: 561867

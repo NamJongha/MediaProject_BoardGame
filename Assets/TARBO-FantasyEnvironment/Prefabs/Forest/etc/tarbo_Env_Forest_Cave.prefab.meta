@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 6090f0961230eb143ade4cfd69844c5a
+timeCreated: 1607861087
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 185045
+  packageName: Fantasy Environment Pack - Low Poly 3D Art
+  packageVersion: 1.0.3
+  assetPath: Assets/TARBO-FantasyEnvironment/Prefabs/Forest/etc/tarbo_Env_Forest_Cave.prefab
+  uploadId: 561867

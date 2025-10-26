@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 3674de35aac061b43bd4e783eee74592
+timeCreated: 1607860818
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 185045
+  packageName: Fantasy Environment Pack - Low Poly 3D Art
+  packageVersion: 1.0.3
+  assetPath: Assets/TARBO-FantasyEnvironment/Prefabs/Desert/Ground-Hex/tarbo_Env_Desert_Hex_River_A.prefab
+  uploadId: 561867

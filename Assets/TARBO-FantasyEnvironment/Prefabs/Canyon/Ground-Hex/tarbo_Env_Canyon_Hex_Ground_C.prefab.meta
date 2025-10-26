@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 5716e76ce7c485f4f98aadbc7c15e1d8
+timeCreated: 1607859916
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 185045
+  packageName: Fantasy Environment Pack - Low Poly 3D Art
+  packageVersion: 1.0.3
+  assetPath: Assets/TARBO-FantasyEnvironment/Prefabs/Canyon/Ground-Hex/tarbo_Env_Canyon_Hex_Ground_C.prefab
+  uploadId: 561867

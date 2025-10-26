@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: f07bb76645726b94aa33bc7f5b32f58b
+timeCreated: 1607865005
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 185045
+  packageName: Fantasy Environment Pack - Low Poly 3D Art
+  packageVersion: 1.0.3
+  assetPath: Assets/TARBO-FantasyEnvironment/Prefabs/Volcano/Ground-Tile/tarbo_Env_Volcano_Mound_A.prefab
+  uploadId: 561867

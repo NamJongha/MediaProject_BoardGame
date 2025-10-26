@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 7846f83cf5aa33b4bbdaadbc482db35a
+timeCreated: 1607861469
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 185045
+  packageName: Fantasy Environment Pack - Low Poly 3D Art
+  packageVersion: 1.0.3
+  assetPath: Assets/TARBO-FantasyEnvironment/Prefabs/Forest_Elf/Plant/tarbo_Env_ForestElf_Bush_B.prefab
+  uploadId: 561867
