@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: c99e7ee87e14c074387be447342b50a8
+timeCreated: 1607861012
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 185045
+  packageName: Fantasy Environment Pack - Low Poly 3D Art
+  packageVersion: 1.0.3
+  assetPath: Assets/TARBO-FantasyEnvironment/Prefabs/Desert/Plant/tarbo_Env_Desert_Tree_C.prefab
+  uploadId: 561867

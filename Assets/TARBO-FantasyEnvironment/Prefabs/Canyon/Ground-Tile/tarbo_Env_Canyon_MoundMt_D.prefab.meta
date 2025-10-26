@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: b04afe7e9b90a0b48aaa5de86c3b828d
+timeCreated: 1607859986
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 185045
+  packageName: Fantasy Environment Pack - Low Poly 3D Art
+  packageVersion: 1.0.3
+  assetPath: Assets/TARBO-FantasyEnvironment/Prefabs/Canyon/Ground-Tile/tarbo_Env_Canyon_MoundMt_D.prefab
+  uploadId: 561867

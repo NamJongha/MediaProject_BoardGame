@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: d77e86aa6b5bcd04f9a03847005978e6
+timeCreated: 1607863804
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 185045
+  packageName: Fantasy Environment Pack - Low Poly 3D Art
+  packageVersion: 1.0.3
+  assetPath: Assets/TARBO-FantasyEnvironment/Prefabs/Frozen/Ice/tarbo_Env_Frozen_Ice_A.prefab
+  uploadId: 561867

@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: ec039da2f658d0840b3737271c36cc2d
+timeCreated: 1607863949
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 185045
+  packageName: Fantasy Environment Pack - Low Poly 3D Art
+  packageVersion: 1.0.3
+  assetPath: Assets/TARBO-FantasyEnvironment/Prefabs/Frozen/Plant/tarbo_Env_Frozen_Tree_Broken_A.prefab
+  uploadId: 561867

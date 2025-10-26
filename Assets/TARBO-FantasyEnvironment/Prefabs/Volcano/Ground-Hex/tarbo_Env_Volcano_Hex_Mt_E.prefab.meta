@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 6487d65c2ba7a364483e993eaf853317
+timeCreated: 1607864984
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 185045
+  packageName: Fantasy Environment Pack - Low Poly 3D Art
+  packageVersion: 1.0.3
+  assetPath: Assets/TARBO-FantasyEnvironment/Prefabs/Volcano/Ground-Hex/tarbo_Env_Volcano_Hex_Mt_E.prefab
+  uploadId: 561867

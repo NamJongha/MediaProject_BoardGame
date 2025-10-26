@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 7f3ab5b8b42f8b84696fa1049495761d
+timeCreated: 1607863762
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 185045
+  packageName: Fantasy Environment Pack - Low Poly 3D Art
+  packageVersion: 1.0.3
+  assetPath: Assets/TARBO-FantasyEnvironment/Prefabs/Frozen/Ground-Hex/tarbo_Env_Frozen_Hex_Ground_Pond.prefab
+  uploadId: 561867

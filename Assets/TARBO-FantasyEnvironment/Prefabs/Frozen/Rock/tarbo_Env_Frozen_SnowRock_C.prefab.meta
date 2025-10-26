@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 6365ddfe9509f734487ef2f7906fa8de
+timeCreated: 1607863922
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 185045
+  packageName: Fantasy Environment Pack - Low Poly 3D Art
+  packageVersion: 1.0.3
+  assetPath: Assets/TARBO-FantasyEnvironment/Prefabs/Frozen/Rock/tarbo_Env_Frozen_SnowRock_C.prefab
+  uploadId: 561867

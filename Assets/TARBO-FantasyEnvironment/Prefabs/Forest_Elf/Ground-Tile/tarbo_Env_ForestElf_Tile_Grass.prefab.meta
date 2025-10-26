@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 332ae5338bdd5b34cbd6f4ae96cbd60c
+timeCreated: 1607861685
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 185045
+  packageName: Fantasy Environment Pack - Low Poly 3D Art
+  packageVersion: 1.0.3
+  assetPath: Assets/TARBO-FantasyEnvironment/Prefabs/Forest_Elf/Ground-Tile/tarbo_Env_ForestElf_Tile_Grass.prefab
+  uploadId: 561867

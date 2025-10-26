@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 0bbbe7e94b8c9024dbe7203b958706b4
+timeCreated: 1607861426
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 185045
+  packageName: Fantasy Environment Pack - Low Poly 3D Art
+  packageVersion: 1.0.3
+  assetPath: Assets/TARBO-FantasyEnvironment/Prefabs/Forest/Plant/tarbo_Env_Forest_Tree_G.prefab
+  uploadId: 561867

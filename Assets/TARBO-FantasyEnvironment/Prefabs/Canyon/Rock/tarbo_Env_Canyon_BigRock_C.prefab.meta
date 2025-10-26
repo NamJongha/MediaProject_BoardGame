@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 01abcafd6af176948a7de1bd6e5d4673
+timeCreated: 1607859575
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 185045
+  packageName: Fantasy Environment Pack - Low Poly 3D Art
+  packageVersion: 1.0.3
+  assetPath: Assets/TARBO-FantasyEnvironment/Prefabs/Canyon/Rock/tarbo_Env_Canyon_BigRock_C.prefab
+  uploadId: 561867

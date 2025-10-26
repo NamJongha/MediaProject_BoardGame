@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 6504014e51c586b43a18d2c41751027d
+timeCreated: 1607865050
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 185045
+  packageName: Fantasy Environment Pack - Low Poly 3D Art
+  packageVersion: 1.0.3
+  assetPath: Assets/TARBO-FantasyEnvironment/Prefabs/Volcano/Ground-Tile/tarbo_Env_Volcano_Riverside_B.prefab
+  uploadId: 561867

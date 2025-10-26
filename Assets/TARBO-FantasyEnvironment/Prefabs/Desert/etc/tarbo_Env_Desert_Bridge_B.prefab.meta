@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: eeab3a39cb3b3674084ae0dbd890ceb0
+timeCreated: 1607860452
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 185045
+  packageName: Fantasy Environment Pack - Low Poly 3D Art
+  packageVersion: 1.0.3
+  assetPath: Assets/TARBO-FantasyEnvironment/Prefabs/Desert/etc/tarbo_Env_Desert_Bridge_B.prefab
+  uploadId: 561867

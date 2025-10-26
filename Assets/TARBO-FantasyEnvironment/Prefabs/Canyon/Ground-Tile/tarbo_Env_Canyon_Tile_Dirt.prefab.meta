@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 175a679e45c6834428d32f82a61c8b74
+timeCreated: 1607860145
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 185045
+  packageName: Fantasy Environment Pack - Low Poly 3D Art
+  packageVersion: 1.0.3
+  assetPath: Assets/TARBO-FantasyEnvironment/Prefabs/Canyon/Ground-Tile/tarbo_Env_Canyon_Tile_Dirt.prefab
+  uploadId: 561867

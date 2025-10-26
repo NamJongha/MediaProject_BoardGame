@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 3948c10e6ce049540a075fc61076454b
+timeCreated: 1607861696
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 185045
+  packageName: Fantasy Environment Pack - Low Poly 3D Art
+  packageVersion: 1.0.3
+  assetPath: Assets/TARBO-FantasyEnvironment/Prefabs/Forest_Elf/Ground-Tile/tarbo_Env_ForestElf_Tile_Water.prefab
+  uploadId: 561867

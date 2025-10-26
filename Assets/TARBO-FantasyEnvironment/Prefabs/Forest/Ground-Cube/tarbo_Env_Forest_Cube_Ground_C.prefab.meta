@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 6fb49b7255c4a4340803464457261aa9
+timeCreated: 1607861094
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 185045
+  packageName: Fantasy Environment Pack - Low Poly 3D Art
+  packageVersion: 1.0.3
+  assetPath: Assets/TARBO-FantasyEnvironment/Prefabs/Forest/Ground-Cube/tarbo_Env_Forest_Cube_Ground_C.prefab
+  uploadId: 561867

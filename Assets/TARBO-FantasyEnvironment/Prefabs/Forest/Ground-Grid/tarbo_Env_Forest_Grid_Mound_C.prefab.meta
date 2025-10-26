@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 4eef0e598f8c9a04fb96d11f33b25502
+timeCreated: 1607861150
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 185045
+  packageName: Fantasy Environment Pack - Low Poly 3D Art
+  packageVersion: 1.0.3
+  assetPath: Assets/TARBO-FantasyEnvironment/Prefabs/Forest/Ground-Grid/tarbo_Env_Forest_Grid_Mound_C.prefab
+  uploadId: 561867

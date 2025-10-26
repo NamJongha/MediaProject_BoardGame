@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: ed34c6fbeb6504f4b9723c5b03418f46
+timeCreated: 1607860174
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 185045
+  packageName: Fantasy Environment Pack - Low Poly 3D Art
+  packageVersion: 1.0.3
+  assetPath: Assets/TARBO-FantasyEnvironment/Prefabs/Canyon/Plant/tarbo_Env_Canyon_Tree_E.prefab
+  uploadId: 561867

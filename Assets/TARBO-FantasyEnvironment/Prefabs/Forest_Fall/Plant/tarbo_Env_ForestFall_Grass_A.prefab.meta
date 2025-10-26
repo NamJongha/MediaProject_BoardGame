@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: a0bceb0ff45318643a21166d17855b1d
+timeCreated: 1607861864
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 185045
+  packageName: Fantasy Environment Pack - Low Poly 3D Art
+  packageVersion: 1.0.3
+  assetPath: Assets/TARBO-FantasyEnvironment/Prefabs/Forest_Fall/Plant/tarbo_Env_ForestFall_Grass_A.prefab
+  uploadId: 561867

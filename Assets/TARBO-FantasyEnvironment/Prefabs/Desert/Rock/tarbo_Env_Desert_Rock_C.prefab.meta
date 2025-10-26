@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 480c2b7fbc064ee4a9d466fef2a96be1
+timeCreated: 1607860978
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 185045
+  packageName: Fantasy Environment Pack - Low Poly 3D Art
+  packageVersion: 1.0.3
+  assetPath: Assets/TARBO-FantasyEnvironment/Prefabs/Desert/Rock/tarbo_Env_Desert_Rock_C.prefab
+  uploadId: 561867

@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 4d41981e9625ab54fa341c3b56e4ef25
+timeCreated: 1607863971
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 185045
+  packageName: Fantasy Environment Pack - Low Poly 3D Art
+  packageVersion: 1.0.3
+  assetPath: Assets/TARBO-FantasyEnvironment/Prefabs/Frozen/Plant/tarbo_Env_Frozen_Tree_NoLeaves_A.prefab
+  uploadId: 561867

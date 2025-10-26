@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: ceec58e778114e044b19bcb134642b6e
+timeCreated: 1607865003
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 185045
+  packageName: Fantasy Environment Pack - Low Poly 3D Art
+  packageVersion: 1.0.3
+  assetPath: Assets/TARBO-FantasyEnvironment/Prefabs/Volcano/Ground-Tile/tarbo_Env_Volcano_LowMoundCir_A.prefab
+  uploadId: 561867

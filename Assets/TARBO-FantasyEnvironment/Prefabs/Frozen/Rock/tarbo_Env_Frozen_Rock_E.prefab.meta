@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 0e655cf6140922d4380442cf5feec9ea
+timeCreated: 1607863902
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 185045
+  packageName: Fantasy Environment Pack - Low Poly 3D Art
+  packageVersion: 1.0.3
+  assetPath: Assets/TARBO-FantasyEnvironment/Prefabs/Frozen/Rock/tarbo_Env_Frozen_Rock_E.prefab
+  uploadId: 561867

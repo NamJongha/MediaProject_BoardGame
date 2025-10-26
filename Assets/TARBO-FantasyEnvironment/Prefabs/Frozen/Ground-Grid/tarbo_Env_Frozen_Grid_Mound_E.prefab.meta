@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 5b6c70f9803bfea429456eeb80caef78
+timeCreated: 1607863716
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 185045
+  packageName: Fantasy Environment Pack - Low Poly 3D Art
+  packageVersion: 1.0.3
+  assetPath: Assets/TARBO-FantasyEnvironment/Prefabs/Frozen/Ground-Grid/tarbo_Env_Frozen_Grid_Mound_E.prefab
+  uploadId: 561867

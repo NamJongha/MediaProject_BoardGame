@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: ae2d066e5218a3a448961fe18593b4f3
+timeCreated: 1607861324
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 185045
+  packageName: Fantasy Environment Pack - Low Poly 3D Art
+  packageVersion: 1.0.3
+  assetPath: Assets/TARBO-FantasyEnvironment/Prefabs/Forest/Ground-Tile/tarbo_Env_Forest_Mt_D.prefab
+  uploadId: 561867

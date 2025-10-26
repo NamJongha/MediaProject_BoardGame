@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: c46ee953771aefd4093cf45848edc4ed
+timeCreated: 1607864861
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 185045
+  packageName: Fantasy Environment Pack - Low Poly 3D Art
+  packageVersion: 1.0.3
+  assetPath: Assets/TARBO-FantasyEnvironment/Prefabs/Volcano/Rock/tarbo_Env_Volcano_BigRock_C.prefab
+  uploadId: 561867

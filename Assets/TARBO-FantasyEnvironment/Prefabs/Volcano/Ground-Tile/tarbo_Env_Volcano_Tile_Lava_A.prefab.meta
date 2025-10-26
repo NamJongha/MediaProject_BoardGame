@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 9fc683fc65f5ac34ca259a2ee7fc1fc9
+timeCreated: 1607865058
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 185045
+  packageName: Fantasy Environment Pack - Low Poly 3D Art
+  packageVersion: 1.0.3
+  assetPath: Assets/TARBO-FantasyEnvironment/Prefabs/Volcano/Ground-Tile/tarbo_Env_Volcano_Tile_Lava_A.prefab
+  uploadId: 561867

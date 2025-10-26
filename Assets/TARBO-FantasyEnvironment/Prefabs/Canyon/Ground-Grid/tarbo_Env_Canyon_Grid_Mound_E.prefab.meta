@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 2b7a112a894e5124db3a1b4ff6687003
+timeCreated: 1607859861
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 185045
+  packageName: Fantasy Environment Pack - Low Poly 3D Art
+  packageVersion: 1.0.3
+  assetPath: Assets/TARBO-FantasyEnvironment/Prefabs/Canyon/Ground-Grid/tarbo_Env_Canyon_Grid_Mound_E.prefab
+  uploadId: 561867

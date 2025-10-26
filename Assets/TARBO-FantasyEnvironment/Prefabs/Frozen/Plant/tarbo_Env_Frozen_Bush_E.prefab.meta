@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 7c7d35bb6f4d4cd44a674eb4e4a21d21
+timeCreated: 1607863642
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 185045
+  packageName: Fantasy Environment Pack - Low Poly 3D Art
+  packageVersion: 1.0.3
+  assetPath: Assets/TARBO-FantasyEnvironment/Prefabs/Frozen/Plant/tarbo_Env_Frozen_Bush_E.prefab
+  uploadId: 561867

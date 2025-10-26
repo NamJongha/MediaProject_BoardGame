@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 2ae8005ab1c36fb4292430d93be2f908
+timeCreated: 1607860096
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 185045
+  packageName: Fantasy Environment Pack - Low Poly 3D Art
+  packageVersion: 1.0.3
+  assetPath: Assets/TARBO-FantasyEnvironment/Prefabs/Canyon/Ground-Tile/tarbo_Env_Canyon_Riverside_B.prefab
+  uploadId: 561867

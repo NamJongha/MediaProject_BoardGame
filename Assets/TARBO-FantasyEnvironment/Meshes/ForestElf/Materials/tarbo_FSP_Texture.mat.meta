@@ -1,0 +1,17 @@
+fileFormatVersion: 2
+guid: 0b502c301d94bd64c85ee520eed2040b
+timeCreated: 1608013834
+licenseType: Store
+NativeFormatImporter:
+  externalObjects: {}
+  mainObjectFileID: 2100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 185045
+  packageName: Fantasy Environment Pack - Low Poly 3D Art
+  packageVersion: 1.0.3
+  assetPath: Assets/TARBO-FantasyEnvironment/Meshes/ForestElf/Materials/tarbo_FSP_Texture.mat
+  uploadId: 561867

@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 72960bd784dbafc4c8552ac44465af9f
+timeCreated: 1607861333
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 185045
+  packageName: Fantasy Environment Pack - Low Poly 3D Art
+  packageVersion: 1.0.3
+  assetPath: Assets/TARBO-FantasyEnvironment/Prefabs/Forest/Plant/tarbo_Env_Forest_MushroomG.prefab
+  uploadId: 561867

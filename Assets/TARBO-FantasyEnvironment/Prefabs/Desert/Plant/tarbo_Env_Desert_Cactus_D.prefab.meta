@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 52d6d11306fd94c438bb68fd24c77b3b
+timeCreated: 1607860479
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 185045
+  packageName: Fantasy Environment Pack - Low Poly 3D Art
+  packageVersion: 1.0.3
+  assetPath: Assets/TARBO-FantasyEnvironment/Prefabs/Desert/Plant/tarbo_Env_Desert_Cactus_D.prefab
+  uploadId: 561867
