@@ -112,6 +112,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ab81c10dae51c724b84e77bfe79ab9d8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Player
+  _isReady: 0
+  _isPlayerTurn: 0
+  endTurnButtonPrefab: {fileID: 7496753795516818450, guid: f7e17a236a7194f4d8a6ec68303d7ab3, type: 3}
 --- !u!1 &2508962580536642891
 GameObject:
   m_ObjectHideFlags: 0
