@@ -43,7 +43,6 @@ public class TurnManager : NetworkBehaviour
                 break;
 
             case TurnState.TurnStart:
-                StartTurn();
                 break;
 
             case TurnState.TurnAction:

@@ -121,7 +121,7 @@ public class Player : NetworkBehaviour
                 }
                 if (change == nameof(isPlayerTurn))
                 {
-                    Debug.Log("Player turn started");
+                    Debug.Log("isPlayerTurnChanged");
                     if (Object.HasInputAuthority && playerButtonPrefab != null)
                     {
                         //show button only when the player turn comes
@@ -290,10 +290,10 @@ public class Player : NetworkBehaviour
     }
     #endregion
 
-    #region player movable while playing game
+    #region player turn state
     public void ChangeIsPlayerTurn(bool state)
     {
-        if ((Object.HasStateAuthority))
+        if ((Runner.IsServer))
         {
             isPlayerTurn = state;
         }
