@@ -43,6 +43,7 @@ public class TurnManager : NetworkBehaviour
                 break;
 
             case TurnState.TurnStart:
+                StartTurn();
                 break;
 
             case TurnState.TurnAction:
@@ -63,9 +64,11 @@ public class TurnManager : NetworkBehaviour
         Button[] buttons = new Button[2];
         buttons = FindObjectsByType<Button>(sortMode: default);
 
-        turnDecideButton = buttons[0];
-        Debug.Log(turnDecideButton.gameObject.name);
-        turnStartButton = buttons[1];
+        foreach(var btn in buttons)
+        {
+            if (btn.name == "OrderDecideButton") turnDecideButton = btn;
+            else if (btn.name == "TurnStartButton") turnStartButton = btn;
+        }
     }
 
     public override void Spawned()
@@ -203,10 +206,10 @@ public class TurnManager : NetworkBehaviour
                 kvp.Value.GetComponent<Player>().ChangeIsPlayerTurn(false);
             }
 
-            yield return null; // 한 프레임 기다려서 ChangeDetector 감지 여유 주기
+            yield return null; // wait for one frame to load it
 
             SetState(TurnState.TurnStart);
-            StartTurn(); // 여기서 다시 true 설정
+            StartTurn(); // restart the turn after end (next player)
         }
     }
 
@@ -218,7 +221,7 @@ public class TurnManager : NetworkBehaviour
 }
 
 #region enum for turn state
-public enum TurnState //유한상태머신으로 턴을 관리하기 위함
+public enum TurnState //Finite State Machine
 {
     WaitingForOrder,
     DecidingOrder,

@@ -1,4 +1,5 @@
 using Fusion;
+using NUnit.Framework;
 using System.Collections;
 using TMPro;
 using UnityEngine;
@@ -12,13 +13,20 @@ public class Player : NetworkBehaviour
 
     [Networked] public bool isPlayerTurn { get; set; }
 
+    [Networked] public NetworkString<_16> playerName { get; set; }
+    [SerializeField] private GameObject nameObject; //text to show name above the player
+    private TextMeshProUGUI nameText;
+
     private int diceNum = 0;
 
     private ChangeDetector changeDetector;
     private TurnManager turnManager;
 
-    [SerializeField] private Button endTurnButtonPrefab;
+    [SerializeField] private Button playerButtonPrefab;
     private Button endTurnButtonInstance;
+    private Button diceRollButtonInstance;
+    private Button useItemButtonInstance;
+    private Button viewMapButtonInstance;
 
     private void Awake()
     {
@@ -31,8 +39,13 @@ public class Player : NetworkBehaviour
 
         changeDetector = GetChangeDetector(ChangeDetector.Source.SimulationState);
 
+        nameText = nameObject.GetComponent<TextMeshProUGUI>();
+
         if (Object.HasInputAuthority)
         {
+            string _playerName = PlayerPrefs.GetString("playerName", $"Player_{Object.InputAuthority.PlayerId}"); //second variable is default value
+            RPC_SetPlayerName(_playerName);
+
             var lobby = FindFirstObjectByType<LobbyManager>();
             if (lobby != null)
             {
@@ -43,39 +56,88 @@ public class Player : NetworkBehaviour
 
             turnManager = FindFirstObjectByType<TurnManager>();
 
-            endTurnButtonInstance = Instantiate(endTurnButtonPrefab);
+            #region instantiate buttons
+            endTurnButtonInstance = Instantiate(playerButtonPrefab);
 
-            //버튼 parent 캔버스로 설정
+            //instantiate player's menu button and rename it
+            diceRollButtonInstance = Instantiate(playerButtonPrefab);
+            diceRollButtonInstance.name = "DiceRollButton";
+            useItemButtonInstance = Instantiate(playerButtonPrefab);
+            useItemButtonInstance.name = "UseItemButton";
+            viewMapButtonInstance = Instantiate(playerButtonPrefab);
+            viewMapButtonInstance.name = "ViewMapButton";
+
+            //Set button's parent to canvas
             endTurnButtonInstance.transform.SetParent(GameObject.Find("Canvas").transform);
+            diceRollButtonInstance.transform.SetParent(GameObject.Find("Canvas").transform);
+            useItemButtonInstance.transform.SetParent(GameObject.Find("Canvas").transform);
+            viewMapButtonInstance.transform.SetParent(GameObject.Find("Canvas").transform);
 
-            //버튼 위치 조정
-            RectTransform rt = endTurnButtonInstance.GetComponent<RectTransform>();
-            rt.anchoredPosition = new Vector2(360, -150);
+            //Set button's position
+            RectTransform rt;
+            rt = endTurnButtonInstance.GetComponent<RectTransform>();
+            rt.anchoredPosition = new Vector2(365, -250);
+            rt = diceRollButtonInstance.GetComponent <RectTransform>();
+            rt.anchoredPosition = new Vector2(365, 170);
+            rt = useItemButtonInstance.GetComponent<RectTransform>();
+            rt.anchoredPosition = new Vector2(365, 120);
+            rt = viewMapButtonInstance.GetComponent<RectTransform>();
+            rt.anchoredPosition = new Vector2(365, 70);
 
-            //버튼 텍스트 설정
+            //Set button's text
             endTurnButtonInstance.GetComponentInChildren<TMP_Text>().text = "End Turn";
+            diceRollButtonInstance.GetComponentInChildren<TMP_Text>().text = "Roll Dice";
+            useItemButtonInstance.GetComponentInChildren<TMP_Text>().text = "Use Item";
+            viewMapButtonInstance.GetComponentInChildren<TMP_Text>().text = "View Map";
 
+            //Add events on button
             endTurnButtonInstance.onClick.AddListener(OnEndTurnButtonClicked);
+
+            //Initialize state
             endTurnButtonInstance.gameObject.SetActive(false);
+            diceRollButtonInstance.gameObject.SetActive(false);
+            useItemButtonInstance.gameObject.SetActive(false);
+            viewMapButtonInstance.gameObject.SetActive(false);
+            #endregion
         }
     }
 
     public override void Render()
     {
         base.Render();
-        foreach(var change in changeDetector.DetectChanges(this))
+
+        if (nameText != null && !string.IsNullOrEmpty(playerName.ToString()))
         {
-            if(change == nameof(isReady))
+            if (nameText.text != playerName.ToString())
             {
-                Debug.Log("this player changed ready state");
+                nameText.text = playerName.ToString();
             }
-            if(change == nameof(isPlayerTurn))
+
+            foreach (var change in changeDetector.DetectChanges(this))
             {
-                Debug.Log("Player turn started");
-                if(Object.HasInputAuthority && endTurnButtonPrefab != null)
+                if (change == nameof(isReady))
                 {
-                    //플레이어 턴에만 버튼 표시
-                    endTurnButtonInstance.gameObject.SetActive(isPlayerTurn);
+                    Debug.Log("this player changed ready state");
+                }
+                if (change == nameof(isPlayerTurn))
+                {
+                    Debug.Log("Player turn started");
+                    if (Object.HasInputAuthority && playerButtonPrefab != null)
+                    {
+                        //show button only when the player turn comes
+                        endTurnButtonInstance.gameObject.SetActive(isPlayerTurn);
+                        diceRollButtonInstance.gameObject.SetActive(isPlayerTurn);
+                        useItemButtonInstance.gameObject.SetActive(isPlayerTurn);
+                        viewMapButtonInstance.gameObject.SetActive(isPlayerTurn);
+                    }
+                }
+                if (change == nameof(playerName))
+                {
+                    Debug.Log($"nameObject: {nameObject}, nameText: {nameText}");
+                    if (nameText != null)
+                    {
+                        nameText.text = playerName.ToString();
+                    }
                 }
             }
         }
@@ -83,21 +145,33 @@ public class Player : NetworkBehaviour
 
     public override void FixedUpdateNetwork()
     {
-            if (GetInput(out NetworkInputData data))
+        if (GetInput(out NetworkInputData data))
+        {
+            if (isPlayerTurn)
             {
-                if (isPlayerTurn)
-                {
-                    data.direction.Normalize();
-                    _cc.Move(5 * data.direction * Runner.DeltaTime);
-                }
-                else
-                {
-                    Vector3 gravity = new Vector3(0, -1, 0);
-                    _cc.Move(5 * gravity * Runner.DeltaTime);
-                }
+                data.direction.Normalize();
+                _cc.Move(5 * data.direction * Runner.DeltaTime);
             }
+            else
+            {
+                Vector3 gravity = new Vector3(0, -1, 0);
+                _cc.Move(5 * gravity * Runner.DeltaTime);
+            }
+        }
+
+        Vector3 euler = gameObject.transform.rotation.eulerAngles;
+        transform.rotation = Quaternion.Euler(0, euler.y, 0);
+
     }
 
+    //Player Name Setting
+    [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
+    private void RPC_SetPlayerName(string name)
+    {
+        playerName = name;
+    }
+
+    #region Button Events
     private void OnEndTurnButtonClicked()
     {
         if (Object.HasInputAuthority)
@@ -116,8 +190,74 @@ public class Player : NetworkBehaviour
         {
             turnManager = FindFirstObjectByType<TurnManager>();
         }
-        turnManager.OnPlayerEndTurn(Object.InputAuthority);
+        turnManager.OnPlayerEndTurn(Object.InputAuthority); //this is for managing turn state in turnManager
     }
+
+    private void OnDiceRollButtonClicked()
+    {
+        if (Object.HasInputAuthority)
+        {
+            if (isPlayerTurn)
+            {
+                RPC_RequestRollDice();
+            }
+        }
+    }
+
+    [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
+    private void RPC_RequestRollDice()
+    {
+        if(turnManager == null)
+        {
+            turnManager = FindFirstObjectByType<TurnManager>();
+        }
+        
+        //write dice roll script here,
+        //this way calls host to roll the dice and synchronize to other clients
+        //if you want to make each client do actual rolling dice, write script in OnDiceRollButtonClicked()
+        //Same for other methods
+    }
+
+    private void OnUseItemButtonClicked()
+    {
+        if (Object.HasInputAuthority) {
+            if (isPlayerTurn)
+            {
+                RPC_RequestUseItem();
+            }
+        }
+    }
+
+    [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
+    private void RPC_RequestUseItem()
+    {
+        if (turnManager == null)
+        {
+            turnManager = FindFirstObjectByType<TurnManager>();
+        }
+    }
+
+    private void OnViewMapButtonClicked()
+    {
+        if (Object.HasInputAuthority) {
+            if (isPlayerTurn)
+            {
+                RPC_RequestViewMap();
+            }
+        }
+    }
+
+    [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
+    private void RPC_RequestViewMap()
+    {
+        if (turnManager == null)
+        {
+            turnManager = FindFirstObjectByType<TurnManager>();
+        }
+
+        //write view map script here
+    }
+    #endregion
 
 
     #region player ready in lobby
@@ -189,6 +329,7 @@ public class Player : NetworkBehaviour
 #endregion
 }
 
+//description below is about player's action on player's turn. Just let me know if you want to get it
 //플레이어 턴에서 할 행동
 //주사위 아이템 맵보기 중 하나 선택하기
 //if 주사위

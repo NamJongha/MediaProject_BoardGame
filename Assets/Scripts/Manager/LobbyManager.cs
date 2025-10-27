@@ -2,6 +2,7 @@ using UnityEngine;
 using Fusion;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
+using System;
 
 public class LobbyManager : MonoBehaviour
 {
@@ -93,7 +94,7 @@ public class LobbyManager : MonoBehaviour
         }
     }
 
-    //호스트로 UpdateButtonState호출 시 LobbyManager에 Runner가 할당되지 않은 상태라 Runner 생성 시 수동으로 등록
+    //when host calls UpdateButtonState, runner is not allocated on LobbyManager, so allocate it manually when the Runner is intantiated
     public void SetRunner(NetworkRunner runner)
     {
         _runner = runner;
