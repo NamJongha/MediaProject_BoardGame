@@ -1,4 +1,4 @@
-using UnityEngine;
+/*using UnityEngine;
 
 public class SpawnPointChecker : MonoBehaviour
 {
@@ -19,3 +19,4 @@ public class SpawnPointChecker : MonoBehaviour
         return isCharacterSpawnedOn;
     }
 }
+*/

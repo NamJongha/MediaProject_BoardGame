@@ -119,6 +119,111 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
+--- !u!1 &88525066
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 88525071}
+  - component: {fileID: 88525070}
+  - component: {fileID: 88525069}
+  - component: {fileID: 88525067}
+  m_Layer: 0
+  m_Name: Player
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &88525067
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 88525066}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8079adcb7d69b734da87ab4f1bcf9d6f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerPathMover
+  moveSpeed: 3
+  boardGenerator: {fileID: 2147414234}
+  debugText: {fileID: 0}
+--- !u!23 &88525069
+MeshRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 88525066}
+  m_Enabled: 1
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
+  m_ForceMeshLod: -1
+  m_MeshLodSelectionBias: 0
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 2100000, guid: 31321ba15b8f8eb4c954353edc038b1d, type: 2}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_GlobalIlluminationMeshLod: 0
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_AdditionalVertexStreams: {fileID: 0}
+--- !u!33 &88525070
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 88525066}
+  m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!4 &88525071
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 88525066}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 503.07715, y: 0, z: 76.89999}
+  m_LocalScale: {x: 5, y: 5, z: 5}
+  m_ConstrainProportionsScale: 1
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &190009392
 GameObject:
   m_ObjectHideFlags: 0
@@ -383,52 +488,6 @@ MonoBehaviour:
     m_VarianceClampScale: 0.9
     m_ContrastAdaptiveSharpening: 0
   m_Version: 2
---- !u!1 &314217715
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 314217716}
-  - component: {fileID: 314217717}
-  m_Layer: 0
-  m_Name: Player
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &314217716
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 314217715}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 33.31489, y: 0, z: -35.55806}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &314217717
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 314217715}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8079adcb7d69b734da87ab4f1bcf9d6f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::PlayerMover
-  currentNode: {fileID: 0}
-  moveSpeed: 3
 --- !u!1 &1095582049
 GameObject:
   m_ObjectHideFlags: 0
@@ -508,21 +567,50 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::BoardGenerator
   nodePrefab: {fileID: 1678424534961314, guid: b9daa9851f57bd34c8bfcfce92a0904b, type: 3}
   parent: {fileID: 1095582050}
-  forestTilePrefab: {fileID: 1111186493504888, guid: b5e6b45d353ed7246a1ad2e9e585accf, type: 3}
-  volcanoTilePrefab: {fileID: 1211835730873914, guid: 938afa21ecff13a4298afff42a7e6eeb, type: 3}
-  glacierTilePrefab: {fileID: 1719660229620474, guid: f465824bb248f904d910f7c12484f8f1, type: 3}
-  mainPathLength: 100
-  branchCount: 5
-  minBranchLength: 3
-  maxBranchLength: 6
-  curveIntensity: 0.01
-  itemChance: 20
-  eventChance: 15
-  trapChance: 10
-  starChance: 5
-  regionSize: 8
-  branchColor: {r: 1, g: 0.3616308, b: 0.19999999, a: 1}
-  mainPathColor: {r: 1, g: 1, b: 1, a: 1}
+  staminaDownTilePrefab: {fileID: 1918540080086148, guid: ee5cab764a4450846a6583052ecff6e3, type: 3}
+  itemTilePrefab: {fileID: 1915541857135646, guid: 70440090a51f89c4eb5eca64e6d18b89, type: 3}
+  staminaUpTilePrefab: {fileID: 1290457995640530, guid: 39794eaf11b917e4f9351df60bef1faf, type: 3}
+  mainPathLength: 80
+  startCoord: {x: 0, y: 0}
+  endCoord: {x: 1000, y: 100}
+  spacingMultiplier: 1.1
+  branchChance: 0.2
+  branchInterval: 15
+  minDistanceBetweenBranches: 2.5
+  branchAngleRange: 60
+  regions:
+  - name: Forest
+    terrainType: 0
+    area:
+      x: 0
+      y: 0
+      width: 250
+      height: 100
+    specialTileCount: 2
+  - name: Desert
+    terrainType: 1
+    area:
+      x: 251
+      y: 0
+      width: 250
+      height: 100
+    specialTileCount: 2
+  - name: Glacire
+    terrainType: 3
+    area:
+      x: 501
+      y: 0
+      width: 250
+      height: 100
+    specialTileCount: 2
+  - name: Volcano
+    terrainType: 2
+    area:
+      x: 751
+      y: 0
+      width: 250
+      height: 100
+    specialTileCount: 2
 --- !u!114 &2147414235
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -543,4 +631,4 @@ SceneRoots:
   - {fileID: 235932366}
   - {fileID: 190009394}
   - {fileID: 2147414233}
-  - {fileID: 314217716}
+  - {fileID: 88525071}

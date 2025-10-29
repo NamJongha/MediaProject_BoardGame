@@ -1,45 +1,42 @@
-using System.Collections.Generic;
 using UnityEngine;
+using System.Collections.Generic;
 
-public enum NodeType { Normal, Item, Event, Battle, Star, Goal }
-public enum TerrainType { Forest, Volcano, Glacier }
+public enum NodeType
+{
+    Normal,
+    Branch,
+    Special,
+    Goal,
+    Start
+}
+
+public enum TerrainType
+{
+    Forest,
+    Desert,
+    Volcano,
+    Glacier
+}
 
 public class BoardNode : MonoBehaviour
 {
     public int id;
-    public NodeType nodeType = NodeType.Normal;
-    public TerrainType terrainType = TerrainType.Forest;
-    public List<BoardNode> nextNodes = new List<BoardNode>();
+    public NodeType nodeType;
+    public TerrainType terrainType;
+    public List<BoardNode> nextNodes = new();
+    public bool isBranchNode = false; // 브랜치 노드 여부 추가
 
-    private void OnDrawGizmos()
+    void OnDrawGizmos()
     {
-        // 지형색 + 이벤트색 혼합 표시
-        Color baseColor = terrainType switch
+        switch (nodeType)
         {
-            TerrainType.Forest => new Color(0.3f, 0.8f, 0.3f),
-            TerrainType.Volcano => new Color(0.9f, 0.3f, 0.1f),
-            TerrainType.Glacier => new Color(0.5f, 0.8f, 1f),
-            _ => Color.white
-        };
-
-        Color eventColor = nodeType switch
-        {
-            NodeType.Goal => Color.yellow,
-            NodeType.Item => Color.green,
-            NodeType.Event => Color.cyan,
-            NodeType.Battle => Color.red,
-            NodeType.Star => Color.magenta,
-            _ => baseColor
-        };
-
-        Gizmos.color = eventColor;
-        Gizmos.DrawSphere(transform.position, 0.35f);
-
-        Gizmos.color = Color.white;
-        foreach (var next in nextNodes)
-        {
-            if (next != null)
-                Gizmos.DrawLine(transform.position, next.transform.position);
+            case NodeType.Start: Gizmos.color = Color.green; break;
+            case NodeType.Goal: Gizmos.color = Color.red; break;
+            case NodeType.Special: Gizmos.color = Color.blue; break;
+            case NodeType.Branch: Gizmos.color = Color.yellow; break;
+            default: Gizmos.color = Color.white; break;
         }
+
+        Gizmos.DrawSphere(transform.position + Vector3.up * 0.5f, 0.3f);
     }
 }
