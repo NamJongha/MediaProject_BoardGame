@@ -80,6 +80,7 @@ public class GameManager : MonoBehaviour, INetworkRunnerCallbacks
 
     private IEnumerator StartAfterLoad()
     {
+
         yield return null;
 
         string curSceneName = PlayerPrefs.GetString("currentScene");
@@ -256,6 +257,9 @@ public class GameManager : MonoBehaviour, INetworkRunnerCallbacks
             Vector3 spawnPosition = new Vector3(0, 0, 0);
             for (int i = 0; i < 4; i++)
             {
+                if (spawnPoints[i] == null){
+                    spawnPoints = GameObject.FindGameObjectsWithTag("SpawnPoint").OrderBy(spawnPoint => spawnPoint.name).ToArray();
+                }
                 if (spawnPoints[i].GetComponent<SpawnPointChecker>().getSpawned())//if player is already spawned on that point
                 {
                     continue; //look for next spawn point

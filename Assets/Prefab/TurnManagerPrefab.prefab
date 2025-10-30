@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2117653592193024769}
   - component: {fileID: 2502942257592152329}
-  - component: {fileID: 6568700961313751063}
+  - component: {fileID: -5218597902070984440}
   m_Layer: 0
   m_Name: TurnManagerPrefab
   m_TagString: Untagged
@@ -50,9 +50,9 @@ MonoBehaviour:
   Flags: 262145
   NestedObjects: []
   NetworkedBehaviours:
-  - {fileID: 6568700961313751063}
+  - {fileID: -5218597902070984440}
   ForceRemoteRenderTimeframe: 0
---- !u!114 &6568700961313751063
+--- !u!114 &-5218597902070984440
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -61,8 +61,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 8513619837263475380}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d99bebec68f04d749ab477c0b7bf719b, type: 3}
+  m_Script: {fileID: 11500000, guid: a99dbf7615c8ba94a92bfe4fcb904ec4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TurnManager
-  turnDecideButton: {fileID: 0}
   _PlayerOrder: []
+  _curState: 0
+  _curTurnIndex: -1
