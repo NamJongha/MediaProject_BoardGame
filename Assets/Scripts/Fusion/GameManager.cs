@@ -80,6 +80,7 @@ public class GameManager : MonoBehaviour, INetworkRunnerCallbacks
 
     private IEnumerator StartAfterLoad()
     {
+
         yield return null;
 
         string curSceneName = PlayerPrefs.GetString("currentScene");
@@ -99,6 +100,8 @@ public class GameManager : MonoBehaviour, INetworkRunnerCallbacks
         {
             if (_runner.IsServer)
             {
+                _runner.Spawn(turnManagerPrefab);
+
                 _spawnedCharacters.Clear();
 
                 foreach (var player in _runner.ActivePlayers)
@@ -118,15 +121,14 @@ public class GameManager : MonoBehaviour, INetworkRunnerCallbacks
                             break;
                         }
                     }
-                    NetworkObject networkPlayerObject = _runner.Spawn(_playerPrefab, spawnPosition, Quaternion.identity, player); //매개변수 player: 아바타에 대한 입력 제공을 하는 플레이어
+                    NetworkObject networkPlayerObject = _runner.Spawn(_playerPrefab, spawnPosition, Quaternion.Euler(0, 180, 0), player); //매개변수 player: 아바타에 대한 입력 제공을 하는 플레이어
+                    _runner.SetPlayerObject(player, networkPlayerObject);
 
-                    networkPlayerObject.GetComponent<Player>().resetReady(); //reset joined player's ready state to false
+                    networkPlayerObject.GetComponent<Player>().ResetIsPlayerTurn(); //reset joined player's ready state to false
 
                     // Keep track of the player avatars for easy access
                     _spawnedCharacters.Add(player, networkPlayerObject);
                 }
-
-                _runner.Spawn(turnManagerPrefab);
             }
         }
     }
@@ -255,6 +257,9 @@ public class GameManager : MonoBehaviour, INetworkRunnerCallbacks
             Vector3 spawnPosition = new Vector3(0, 0, 0);
             for (int i = 0; i < 4; i++)
             {
+                if (spawnPoints[i] == null){
+                    spawnPoints = GameObject.FindGameObjectsWithTag("SpawnPoint").OrderBy(spawnPoint => spawnPoint.name).ToArray();
+                }
                 if (spawnPoints[i].GetComponent<SpawnPointChecker>().getSpawned())//if player is already spawned on that point
                 {
                     continue; //look for next spawn point
@@ -266,7 +271,7 @@ public class GameManager : MonoBehaviour, INetworkRunnerCallbacks
                     break;
                 }
             }
-            NetworkObject networkPlayerObject = runner.Spawn(_playerPrefab, spawnPosition, Quaternion.identity, player); //매개변수 player: 아바타에 대한 입력 제공을 하는 플레이어
+            NetworkObject networkPlayerObject = runner.Spawn(_playerPrefab, spawnPosition, Quaternion.Euler(0, 180, 0), player); //매개변수 player: 아바타에 대한 입력 제공을 하는 플레이어
 
             networkPlayerObject.GetComponent<Player>().resetReady(); //reset joined player's ready state to false
 
@@ -311,9 +316,17 @@ public class GameManager : MonoBehaviour, INetworkRunnerCallbacks
         throw new NotImplementedException();
     }
 
-    public void OnShutdown(NetworkRunner runner, ShutdownReason shutdownReason)
+    public async void OnShutdown(NetworkRunner runner, ShutdownReason shutdownReason)
     {
         Debug.Log(shutdownReason);
+
+        await runner.Shutdown();
+
+        if(runner != null)
+        {
+            Destroy(runner.gameObject);
+        }
+
         SceneManager.LoadScene("TitleScene");
     }
 

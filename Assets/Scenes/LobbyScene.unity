@@ -592,7 +592,7 @@ GameObject:
   - component: {fileID: 524860213}
   - component: {fileID: 524860212}
   m_Layer: 5
-  m_Name: CanvasForLobby
+  m_Name: Canvas
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -694,7 +694,7 @@ GameObject:
   - component: {fileID: 531136499}
   - component: {fileID: 531136498}
   - component: {fileID: 531136497}
-  - component: {fileID: 531136496}
+  - component: {fileID: 531136500}
   m_Layer: 0
   m_Name: SpawnPoint4
   m_TagString: SpawnPoint
@@ -717,19 +717,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 676939215}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &531136496
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 531136494}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d5262e87426a47d43a70c6061d60400b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::SpawnPointChecker
-  isCharacterSpawnedOn: 0
 --- !u!65 &531136497
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -807,6 +794,19 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 531136494}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!114 &531136500
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 531136494}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 790a17c2a8630a64b9137626e6cef485, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SpawnPointChecker
+  isCharacterSpawnedOn: 0
 --- !u!1 &536492713
 GameObject:
   m_ObjectHideFlags: 0
@@ -1242,7 +1242,7 @@ GameObject:
   - component: {fileID: 984832301}
   - component: {fileID: 984832300}
   - component: {fileID: 984832299}
-  - component: {fileID: 984832298}
+  - component: {fileID: 984832302}
   m_Layer: 0
   m_Name: SpawnPoint2
   m_TagString: SpawnPoint
@@ -1265,19 +1265,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 676939215}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &984832298
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 984832296}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d5262e87426a47d43a70c6061d60400b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::SpawnPointChecker
-  isCharacterSpawnedOn: 0
 --- !u!65 &984832299
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -1355,6 +1342,19 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 984832296}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!114 &984832302
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 984832296}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 790a17c2a8630a64b9137626e6cef485, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SpawnPointChecker
+  isCharacterSpawnedOn: 0
 --- !u!1 &1006073004
 GameObject:
   m_ObjectHideFlags: 0
@@ -1505,7 +1505,7 @@ GameObject:
   - component: {fileID: 1618538307}
   - component: {fileID: 1618538306}
   - component: {fileID: 1618538305}
-  - component: {fileID: 1618538304}
+  - component: {fileID: 1618538308}
   m_Layer: 0
   m_Name: SpawnPoint3
   m_TagString: SpawnPoint
@@ -1528,19 +1528,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 676939215}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1618538304
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1618538302}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d5262e87426a47d43a70c6061d60400b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::SpawnPointChecker
-  isCharacterSpawnedOn: 0
 --- !u!65 &1618538305
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -1618,6 +1605,19 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1618538302}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!114 &1618538308
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1618538302}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 790a17c2a8630a64b9137626e6cef485, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SpawnPointChecker
+  isCharacterSpawnedOn: 0
 --- !u!1 &1842163327
 GameObject:
   m_ObjectHideFlags: 0
@@ -1767,7 +1767,7 @@ GameObject:
   - component: {fileID: 1951531946}
   - component: {fileID: 1951531945}
   - component: {fileID: 1951531944}
-  - component: {fileID: 1951531943}
+  - component: {fileID: 1951531947}
   m_Layer: 0
   m_Name: SpawnPoint1
   m_TagString: SpawnPoint
@@ -1790,19 +1790,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 676939215}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1951531943
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1951531941}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d5262e87426a47d43a70c6061d60400b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::SpawnPointChecker
-  isCharacterSpawnedOn: 0
 --- !u!65 &1951531944
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -1880,6 +1867,19 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1951531941}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!114 &1951531947
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1951531941}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 790a17c2a8630a64b9137626e6cef485, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SpawnPointChecker
+  isCharacterSpawnedOn: 0
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
