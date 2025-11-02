@@ -22,12 +22,9 @@ public class TurnManager : NetworkBehaviour
     {
         if (!Object.HasStateAuthority) return;
 
-        if(turnDecideButton == null || turnStartButton == null)
-        {
-            return;
-        }
+        Debug.Assert(turnDecideButton != null || turnStartButton != null);
 
-        Debug.Log("Change current state to "  + state);
+        Debug.Log("Change current state to " + state);
         curState = state;
 
         switch (state)
@@ -63,7 +60,7 @@ public class TurnManager : NetworkBehaviour
         Button[] buttons = new Button[2];
         buttons = FindObjectsByType<Button>(sortMode: default);
 
-        foreach(var btn in buttons)
+        foreach (var btn in buttons)
         {
             if (btn.name == "OrderDecideButton") turnDecideButton = btn;
             else if (btn.name == "TurnStartButton") turnStartButton = btn;
@@ -105,7 +102,6 @@ public class TurnManager : NetworkBehaviour
     {
         if (Object.HasStateAuthority)
         {
-
             if (curState == TurnState.WaitingForOrder)
             {
                 SetState(TurnState.DecidingOrder);
@@ -117,9 +113,10 @@ public class TurnManager : NetworkBehaviour
 
     private void OnTurnStartButtonClicked()
     {
-        if (Object.HasStateAuthority) {
-        StartTurn();
-            }
+        if (Object.HasStateAuthority)
+        {
+            StartTurn();
+        }
     }
 
     private void DecideTurnOrder()
@@ -130,32 +127,36 @@ public class TurnManager : NetworkBehaviour
 
         List<(PlayerRef player, int dice)> result = new List<(PlayerRef, int)>();
 
-        foreach(var kvp in gameManager.GetPlayersList())
+        foreach (var kvp in gameManager.GetPlayersList())
         {
             kvp.Value.GetComponent<Player>().RollTheDice();
 
             PlayerRef playerRef = kvp.Key;
             int dice = kvp.Value.GetComponent<Player>().GetDiceNum();
 
-            Debug.Log(playerRef + " player's dice number: " + dice);
-            Debug.Log("This Player's name is " + kvp.Value.gameObject.name);
+            LogManager.Instance.Log($"player {kvp.Value.GetComponent<Player>().playerName} dice number is {dice}");
             result.Add((playerRef, dice));
         }
 
         result.Sort((player1, player2) => player2.dice.CompareTo(player1.dice));
 
-        for(int i = 0; i < Runner.ActivePlayers.Count(); i++)
+        string orderString = "";
+        for (int i = 0; i < Runner.ActivePlayers.Count(); i++)
         {
             PlayerOrder.Set(i, result[i].player);
             Debug.Log(i + " order player: " + PlayerOrder[i]);
+            NetworkObject playerObject = gameManager.GetPlayersList().GetValueOrDefault(PlayerOrder[i]);
+            orderString = $"{orderString} {(i+1)}: {playerObject.GetComponent<Player>().playerName}";
         }
+        
+        LogManager.Instance.Log($"Set order is {orderString}");
     }
 
     private void StartTurn()
     {
         if (!Object.HasStateAuthority) return;
 
-        if(curTurnIndex == -1) curTurnIndex = 0;
+        if (curTurnIndex == -1) curTurnIndex = 0;
         else
         {
             curTurnIndex = (curTurnIndex + 1) % Runner.ActivePlayers.Count();
@@ -169,31 +170,11 @@ public class TurnManager : NetworkBehaviour
 
         curPlayerObj.GetComponent<Player>().ChangeIsPlayerTurn(true);
         Debug.Log(curPlayerRef + " turn started");
+        LogManager.Instance.Log($"{curPlayerObj.GetComponent<Player>().playerName} turn started");
 
         SetState(TurnState.TurnAction);
     }
-
-    public void OnPlayerEndTurn(PlayerRef player)
-    {
-        if (Object.HasStateAuthority && PlayerOrder.Get(curTurnIndex) ==  player)
-        {
-            SetState(TurnState.TurnEnd);
-        }
-    }
-
-    private void EndTurn()
-    {
-        PlayerRef curPlayerRef = PlayerOrder.Get(curTurnIndex);
-        NetworkObject curPlayerObj = Runner.GetPlayerObject(curPlayerRef);
-
-        curPlayerObj.GetComponent<Player>().ChangeIsPlayerTurn(false);
-
-        if (Object.HasStateAuthority)
-        {
-            StartCoroutine(DelayedStartTurn(1.0f));
-        }
-    }
-
+    
     private IEnumerator DelayedStartTurn(float delay)
     {
         yield return new WaitForSeconds(delay);
@@ -212,6 +193,26 @@ public class TurnManager : NetworkBehaviour
         }
     }
 
+    public void OnPlayerEndTurn(PlayerRef player)
+    {
+        Debug.Assert(Object.HasStateAuthority && PlayerOrder.Get(curTurnIndex) == player);
+        SetState(TurnState.TurnEnd);
+    }
+
+    private void EndTurn()
+    {
+        PlayerRef curPlayerRef = PlayerOrder.Get(curTurnIndex);
+        NetworkObject curPlayerObj = Runner.GetPlayerObject(curPlayerRef);
+
+        curPlayerObj.GetComponent<Player>().ChangeIsPlayerTurn(false);
+        
+        LogManager.Instance.Log($"{curPlayerObj.GetComponent<Player>().playerName} ended turn");
+
+        if (Object.HasStateAuthority)
+        {
+            StartCoroutine(DelayedStartTurn(1.0f));
+        }
+    }
 
     public void ResetOrder()
     {
@@ -220,6 +221,7 @@ public class TurnManager : NetworkBehaviour
 }
 
 #region enum for turn state
+
 public enum TurnState //Finite State Machine
 {
     WaitingForOrder,
@@ -229,4 +231,5 @@ public enum TurnState //Finite State Machine
     TurnEnd,
     GameOver
 }
+
 #endregion
