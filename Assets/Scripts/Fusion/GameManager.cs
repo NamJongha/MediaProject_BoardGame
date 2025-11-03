@@ -121,7 +121,7 @@ public class GameManager : MonoBehaviour, INetworkRunnerCallbacks
                             break;
                         }
                     }
-                    NetworkObject networkPlayerObject = _runner.Spawn(_playerPrefab, spawnPosition, Quaternion.Euler(0, 180, 0), player); //¸Å°³º¯¼ö player: ¾Æ¹ÙÅ¸¿¡ ´ëÇÑ ÀÔ·Â Á¦°øÀ» ÇÏ´Â ÇÃ·¹ÀÌ¾î
+                    NetworkObject networkPlayerObject = _runner.Spawn(_playerPrefab, spawnPosition, Quaternion.Euler(0, 0, 0), player); //ï¿½Å°ï¿½ï¿½ï¿½ï¿½ï¿½ player: ï¿½Æ¹ï¿½Å¸ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Ô·ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ï´ï¿½ ï¿½Ã·ï¿½ï¿½Ì¾ï¿½
                     _runner.SetPlayerObject(player, networkPlayerObject);
 
                     networkPlayerObject.GetComponent<Player>().ResetIsPlayerTurn(); //reset joined player's ready state to false
@@ -251,9 +251,6 @@ public class GameManager : MonoBehaviour, INetworkRunnerCallbacks
     {
         if (runner.IsServer) //if the runner is host player
         {
-            // Create a unique position for the player
-            //Vector3 spawnPosition = new Vector3((player.RawEncoded % runner.Config.Simulation.PlayerCount) * 3, 1, 0);
-
             Vector3 spawnPosition = new Vector3(0, 0, 0);
             for (int i = 0; i < 4; i++)
             {
@@ -271,7 +268,7 @@ public class GameManager : MonoBehaviour, INetworkRunnerCallbacks
                     break;
                 }
             }
-            NetworkObject networkPlayerObject = runner.Spawn(_playerPrefab, spawnPosition, Quaternion.Euler(0, 180, 0), player); //¸Å°³º¯¼ö player: ¾Æ¹ÙÅ¸¿¡ ´ëÇÑ ÀÔ·Â Á¦°øÀ» ÇÏ´Â ÇÃ·¹ÀÌ¾î
+            NetworkObject networkPlayerObject = runner.Spawn(_playerPrefab, spawnPosition, Quaternion.Euler(0, 0, 0), player); //ï¿½Å°ï¿½ï¿½ï¿½ï¿½ï¿½ player: ï¿½Æ¹ï¿½Å¸ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½Ô·ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ï´ï¿½ ï¿½Ã·ï¿½ï¿½Ì¾ï¿½
 
             networkPlayerObject.GetComponent<Player>().resetReady(); //reset joined player's ready state to false
 

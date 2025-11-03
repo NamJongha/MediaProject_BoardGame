@@ -46,7 +46,7 @@ public class Player : NetworkBehaviour
             string _playerName = PlayerPrefs.GetString("playerName", $"Player_{Object.InputAuthority.PlayerId}"); //second variable is default value
             RPC_SetPlayerName(_playerName);
 
-            var lobby = FindFirstObjectByType<LobbyManager>();
+            LobbyManager lobby = FindFirstObjectByType<LobbyManager>();
             if (lobby != null)
             {
                 Debug.Log("Found lobby manager");
@@ -115,10 +115,6 @@ public class Player : NetworkBehaviour
 
             foreach (var change in changeDetector.DetectChanges(this))
             {
-                if (change == nameof(isReady))
-                {
-                    Debug.Log("this player changed ready state");
-                }
                 if (change == nameof(isPlayerTurn))
                 {
                     Debug.Log("isPlayerTurnChanged");
@@ -133,10 +129,11 @@ public class Player : NetworkBehaviour
                 }
                 if (change == nameof(playerName))
                 {
-                    Debug.Log($"nameObject: {nameObject}, nameText: {nameText}");
-                    if (nameText != null)
+                    Debug.Assert(nameText != null);
+                    nameText.text = playerName.ToString();
+                    if (Object.HasStateAuthority)
                     {
-                        nameText.text = playerName.ToString();
+                        LogManager.Instance.Log($"{playerName} joined the session");
                     }
                 }
             }
@@ -156,12 +153,13 @@ public class Player : NetworkBehaviour
             {
                 Vector3 gravity = new Vector3(0, -1, 0);
                 _cc.Move(5 * gravity * Runner.DeltaTime);
+                
+                transform.up = Vector3.up;
+                transform.rotation = Quaternion.Euler(0, 180, 0);
             }
         }
-
         Vector3 euler = gameObject.transform.rotation.eulerAngles;
         transform.rotation = Quaternion.Euler(0, euler.y, 0);
-
     }
 
     //Player Name Setting
@@ -271,6 +269,9 @@ public class Player : NetworkBehaviour
         {
             RPC_RequestChangeReady(!isReady);
         }
+        
+        string msg = isReady? "not ready" : "ready";
+        LogManager.Instance.Log($"{playerName} {msg}");
     }
 
     //isReady should be changed by the Host -> client send change to host with rpc
@@ -328,24 +329,3 @@ public class Player : NetworkBehaviour
     }
 #endregion
 }
-
-//description below is about player's action on player's turn. Just let me know if you want to get it
-//플레이어 턴에서 할 행동
-//주사위 아이템 맵보기 중 하나 선택하기
-//if 주사위
-//  주사위 굴리기
-//  나온 수만큼 전진
-//  전진 중 갈림길 나오면 선택
-//  갈림길 선택 후 다시 전진
-//  이벤트칸 도착 시 이벤트
-//  턴 종료
-//else if 아이템
-//  갖고 있는 아이템 중 하나 선택
-//  아이템이 타겟형인 경우 플레이어 선택
-//  선택한 아이템 능력 발동
-//  주사위와 맵보기 중 선택
-//else if 맵보기
-//  플레이어 입력 수집
-//  입력에 따라 카메라 이동
-//  if 플레이어 맵보기 종료
-//      주사위 아이템 맵보기 중 선택

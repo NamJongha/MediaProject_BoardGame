@@ -3,6 +3,7 @@ using Fusion;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using System;
+using System.Collections.Generic;
 
 public class LobbyManager : MonoBehaviour
 {
@@ -10,7 +11,7 @@ public class LobbyManager : MonoBehaviour
     [SerializeField] private Button gameReadyButton;
 
     private Player localPlayer;
-    private NetworkRunner _runner;
+    private NetworkRunner runner;
     private GameManager gameManager;
 
     private bool isAllPlayerReady;
@@ -18,7 +19,7 @@ public class LobbyManager : MonoBehaviour
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        _runner = FindFirstObjectByType<NetworkRunner>();
+        runner = FindFirstObjectByType<NetworkRunner>();
         gameManager = FindFirstObjectByType<GameManager>();
 
         gameStartButton.onClick.AddListener(OnClickStartButton);
@@ -33,17 +34,17 @@ public class LobbyManager : MonoBehaviour
     {
         Debug.Log("Lobby Manager is Running");
 
-        if(_runner == null)
+        if(runner == null)
         {
-            _runner = NetworkRunner.GetRunnerForScene(SceneManager.GetActiveScene());
+            runner = NetworkRunner.GetRunnerForScene(SceneManager.GetActiveScene());
             Debug.Log("LobbyManagerSet");
             //If the runner is null, repeat only the code above so that the cost gets smaller
-            if (_runner == null) return;
+            if (runner == null) return;
         }
 
-        if (_runner.IsServer)
+        if (runner.IsServer)
         {
-            var playerList = gameManager.GetPlayersList(); //Dictionary from gameManager
+            Dictionary<PlayerRef, NetworkObject> playerList = gameManager.GetPlayersList(); //Dictionary from gameManager
             Debug.Log("There are " + playerList.Count + " players in the lobby");
 
             foreach(var kvp in playerList)
@@ -72,17 +73,17 @@ public class LobbyManager : MonoBehaviour
     {
         Debug.Log("update button called");
 
-        if (_runner == null)
+        if (runner == null)
         {
-            _runner = NetworkRunner.GetRunnerForScene(SceneManager.GetActiveScene());
-            if(_runner == null)
+            runner = NetworkRunner.GetRunnerForScene(SceneManager.GetActiveScene());
+            if(runner == null)
             {
                 return;
             }
             Debug.Log("LobbyManagerSet");
         }
 
-            if (_runner.IsServer)
+        if (runner.IsServer)
         {
             gameStartButton.gameObject.SetActive(true);
             gameReadyButton.gameObject.SetActive(false);
@@ -97,7 +98,7 @@ public class LobbyManager : MonoBehaviour
     //when host calls UpdateButtonState, runner is not allocated on LobbyManager, so allocate it manually when the Runner is intantiated
     public void SetRunner(NetworkRunner runner)
     {
-        _runner = runner;
+        this.runner = runner;
     }
 
     public void SetLocalPlayer(Player player)
@@ -113,20 +114,22 @@ public class LobbyManager : MonoBehaviour
 
     private void OnClickStartButton()
     {
-        if (!_runner.IsServer) return;
+        Debug.Assert(runner.IsServer);
+        
         if(isAllPlayerReady == false)
         {
-            Debug.Log("All the players should be logged in");
+            LogManager.Instance.Log("All players must be ready to start the game");
             return;
         }
+        
         foreach(var kvp in gameManager.GetPlayersList())
         {
             if (kvp.Value != null)
             {
-                _runner.Despawn(kvp.Value);
+                runner.Despawn(kvp.Value);
                 Debug.Log("player " + kvp.Key + " is despawned");
             }
         }
-        _runner.LoadScene("GameScene");
+        runner.LoadScene("GameScene");
     }
 }
