@@ -14,49 +14,12 @@ public class TurnManager : NetworkBehaviour
     private Button turnStartButton;
 
     [Networked, Capacity(4)] public NetworkArray<PlayerRef> PlayerOrder => default;
-    [Networked] public TurnState curState { get; set; } = TurnState.WaitingForOrder;
+    [Networked] public TurnState curState { get; set; }
     [Networked] public int curTurnIndex { get; set; } = -1;
 
     private ITurnState curTurnState;
     
     private GameManager gameManager;
-
-    /*private void SetState(TurnState state)
-    {
-        if (!Object.HasStateAuthority) return;
-
-        Debug.Assert(turnDecideButton != null || turnStartButton != null);
-
-        Debug.Log("Change current state to " + state);
-        curState = state;
-
-        switch (state)
-        {
-            case TurnState.WaitingForOrder:
-                turnDecideButton.gameObject.SetActive(true);
-                turnStartButton.gameObject.SetActive(false);
-                break;
-
-            case TurnState.DecidingOrder:
-                turnDecideButton.gameObject.SetActive(false);
-                turnStartButton.gameObject.SetActive(true);
-                break;
-
-            case TurnState.TurnStart:
-                break;
-
-            case TurnState.TurnAction:
-                turnStartButton.gameObject.SetActive(false);
-                break;
-
-            case TurnState.TurnEnd:
-                EndTurn();
-                break;
-
-            case TurnState.GameOver:
-                break;
-        }
-    }*/
 
     private void Awake()
     {
@@ -98,20 +61,16 @@ public class TurnManager : NetworkBehaviour
         yield return null;
 
         Debug.Log("TurnManager: DelayedInitState called, setting to WaitingForOrder");
-        //SetState(TurnState.WaitingForOrder);
+
         curTurnState = new WaitingForOrderState(this);
-        curTurnState.OnStateEnter(); // waiting for order
+        curTurnState.OnStateEnter(); // waiting for order, initialize
     }
 
     private void OnDecideButtonClicked()
     {
         if (Object.HasStateAuthority)
         {
-            /*if (curState == TurnState.WaitingForOrder)
-            {
-                SetState(TurnState.DecidingOrder);
-            }*/
-            curTurnState.OnStateExit(); //waiting for order -> deciding order
+            ChangeState(new DecidingOrderState(this)); // waiting for order state -> deciding turn state
             DecideTurnOrder();
         }
     }
@@ -120,7 +79,7 @@ public class TurnManager : NetworkBehaviour
     {
         if (Object.HasStateAuthority)
         {
-            curTurnState.OnStateExit();// Deciding order state -> turn start state
+            ChangeState(new TurnStartState(this)); // deciding turn state -> turn start state
             StartTurn();
         }
     }
@@ -130,8 +89,6 @@ public class TurnManager : NetworkBehaviour
         //each player roll the dice
         //after all the players roll it, order it from big num to small num
         //big number start first
-
-        curTurnState.OnStateEnter(); //Deciding Order State
         
         List<(PlayerRef player, int dice)> result = new List<(PlayerRef, int)>();
 
@@ -162,8 +119,6 @@ public class TurnManager : NetworkBehaviour
 
     public void StartTurn()
     {
-        curTurnState.OnStateEnter(); //turn start state
-        
         if (!Object.HasStateAuthority) return;
 
         if (curTurnIndex == -1) curTurnIndex = 0;
@@ -181,10 +136,8 @@ public class TurnManager : NetworkBehaviour
         curPlayerObj.GetComponent<Player>().ChangeIsPlayerTurn(true);
         Debug.Log(curPlayerRef + " turn started");
         LogManager.Instance.Log($"{curPlayerObj.GetComponent<Player>().playerName} turn started");
-
-        //SetState(TurnState.TurnAction);
-        curTurnState.OnStateExit(); // turn start state -> turn action state
-        curTurnState.OnStateEnter(); // turn action state
+        
+        ChangeState(new TurnActionState(this)); // turn start state -> turn action state
     }
     
     private IEnumerator DelayedStartTurn(float delay)
@@ -199,8 +152,7 @@ public class TurnManager : NetworkBehaviour
             }
 
             yield return null; // wait for one frame to load it
-
-            //SetState(TurnState.TurnStart);
+            
             StartTurn(); // restart the turn after end (next player)
         }
     }
@@ -208,15 +160,13 @@ public class TurnManager : NetworkBehaviour
     public void OnPlayerEndTurn(PlayerRef player)
     {
         Debug.Assert(Object.HasStateAuthority && PlayerOrder.Get(curTurnIndex) == player);
-        //SetState(TurnState.TurnEnd);
-        curTurnState.OnStateExit(); // turn action state -> turn end state
+
+        ChangeState(new TurnEndState(this));
         EndTurn();
     }
 
     private void EndTurn()
     {
-        curTurnState.OnStateEnter(); // turn end state
-        
         PlayerRef curPlayerRef = PlayerOrder.Get(curTurnIndex);
         NetworkObject curPlayerObj = Runner.GetPlayerObject(curPlayerRef);
 
@@ -229,7 +179,7 @@ public class TurnManager : NetworkBehaviour
             StartCoroutine(DelayedStartTurn(1.0f));
         }
         
-        curTurnState.OnStateExit(); // turn end state -> turn start state
+        ChangeState(new TurnStartState(this)); // turn end state -> turn start state
     }
 
     public void ResetOrder()
@@ -249,13 +199,15 @@ public class TurnManager : NetworkBehaviour
 
     public void ChangeState(ITurnState newState)
     {
+        curTurnState.OnStateExit();
         curTurnState = newState;
+        curTurnState.OnStateEnter();
     }
 }
 
 #region enum for turn state
 
-public enum TurnState //Finite State Machine
+public enum TurnState //Finite State Machine maybe can use for network synchronization
 {
     WaitingForOrder,
     DecidingOrder,

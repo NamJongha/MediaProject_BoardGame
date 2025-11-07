@@ -19,7 +19,7 @@
         public void OnStateExit()
         {
             LogManager.Instance.Log("Exiting WaitingForOrderState");
-            turnManager.ChangeState(new DecidingOrderState(turnManager));
+            turnManager.ShowTurnDecideButton(false);
         }
     }
 }

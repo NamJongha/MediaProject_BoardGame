@@ -17,7 +17,6 @@
         public void OnStateExit()
         {
             LogManager.Instance.Log("Exiting TurnActionState");
-            turnManager.ChangeState(new TurnEndState(turnManager));
         }
     }
 }
