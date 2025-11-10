@@ -1,6 +1,5 @@
 using Fusion;
-using NUnit.Framework;
-using System.Collections;
+using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -10,14 +9,16 @@ public class Player : NetworkBehaviour
     private NetworkCharacterController _cc;
 
     [Networked] public bool isReady { get; set; }
-
     [Networked] public bool isPlayerTurn { get; set; }
-
     [Networked] public NetworkString<_16> playerName { get; set; }
+    [Networked] public int playerStamina { get; set; } = 12;
+
     [SerializeField] private GameObject nameObject; //text to show name above the player
     private TextMeshProUGUI nameText;
 
     private int diceNum = 0;
+    
+    private List<IItemStrategy> playerItemList = new List<IItemStrategy>(3);
 
     private ChangeDetector changeDetector;
     private TurnManager turnManager;
@@ -29,6 +30,7 @@ public class Player : NetworkBehaviour
     private Button viewMapButtonInstance;
 
     private void Awake()
+    
     {
         _cc = GetComponent<NetworkCharacterController>();
     }
@@ -57,6 +59,7 @@ public class Player : NetworkBehaviour
             turnManager = FindFirstObjectByType<TurnManager>();
 
             #region instantiate buttons
+
             endTurnButtonInstance = Instantiate(playerButtonPrefab);
 
             //instantiate player's menu button and rename it
@@ -77,7 +80,7 @@ public class Player : NetworkBehaviour
             RectTransform rt;
             rt = endTurnButtonInstance.GetComponent<RectTransform>();
             rt.anchoredPosition = new Vector2(365, -250);
-            rt = diceRollButtonInstance.GetComponent <RectTransform>();
+            rt = diceRollButtonInstance.GetComponent<RectTransform>();
             rt.anchoredPosition = new Vector2(365, 170);
             rt = useItemButtonInstance.GetComponent<RectTransform>();
             rt.anchoredPosition = new Vector2(365, 120);
@@ -98,6 +101,7 @@ public class Player : NetworkBehaviour
             diceRollButtonInstance.gameObject.SetActive(false);
             useItemButtonInstance.gameObject.SetActive(false);
             viewMapButtonInstance.gameObject.SetActive(false);
+
             #endregion
         }
     }
@@ -118,7 +122,8 @@ public class Player : NetworkBehaviour
                 if (change == nameof(isPlayerTurn))
                 {
                     Debug.Log("isPlayerTurnChanged");
-                    if (Object.HasInputAuthority && playerButtonPrefab != null)
+                    Debug.Assert(playerButtonPrefab != null);
+                    if (Object.HasInputAuthority)
                     {
                         //show button only when the player turn comes
                         endTurnButtonInstance.gameObject.SetActive(isPlayerTurn);
@@ -127,6 +132,7 @@ public class Player : NetworkBehaviour
                         viewMapButtonInstance.gameObject.SetActive(isPlayerTurn);
                     }
                 }
+
                 if (change == nameof(playerName))
                 {
                     Debug.Assert(nameText != null);
@@ -153,11 +159,12 @@ public class Player : NetworkBehaviour
             {
                 Vector3 gravity = new Vector3(0, -1, 0);
                 _cc.Move(5 * gravity * Runner.DeltaTime);
-                
+
                 transform.up = Vector3.up;
                 transform.rotation = Quaternion.Euler(0, 180, 0);
             }
         }
+
         Vector3 euler = gameObject.transform.rotation.eulerAngles;
         transform.rotation = Quaternion.Euler(0, euler.y, 0);
     }
@@ -170,6 +177,7 @@ public class Player : NetworkBehaviour
     }
 
     #region Button Events
+
     private void OnEndTurnButtonClicked()
     {
         if (Object.HasInputAuthority)
@@ -188,6 +196,7 @@ public class Player : NetworkBehaviour
         {
             turnManager = FindFirstObjectByType<TurnManager>();
         }
+
         turnManager.OnPlayerEndTurn(Object.InputAuthority); //this is for managing turn state in turnManager
     }
 
@@ -205,20 +214,27 @@ public class Player : NetworkBehaviour
     [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
     private void RPC_RequestRollDice()
     {
-        if(turnManager == null)
+        if (turnManager == null)
         {
             turnManager = FindFirstObjectByType<TurnManager>();
         }
-        
+
         //write dice roll script here,
         //this way calls host to roll the dice and synchronize to other clients
         //if you want to make each client do actual rolling dice, write script in OnDiceRollButtonClicked()
         //Same for other methods
+        
+        //roll the dice
+        //show the result
+        //set move count according to the stamina (max value of dice reduces 1 everytime the stamina reduces 2)
+        //move player character
+        //reduce stamina
     }
 
     private void OnUseItemButtonClicked()
     {
-        if (Object.HasInputAuthority) {
+        if (Object.HasInputAuthority)
+        {
             if (isPlayerTurn)
             {
                 RPC_RequestUseItem();
@@ -229,15 +245,17 @@ public class Player : NetworkBehaviour
     [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
     private void RPC_RequestUseItem()
     {
-        if (turnManager == null)
-        {
-            turnManager = FindFirstObjectByType<TurnManager>();
-        }
+        Debug.Assert(turnManager != null);
+        // 1. Show item list with UI
+        // 2. Choose item with mouse
+        // 3. Show item effect
+        // 4. Return to which button to choose
     }
 
     private void OnViewMapButtonClicked()
     {
-        if (Object.HasInputAuthority) {
+        if (Object.HasInputAuthority)
+        {
             if (isPlayerTurn)
             {
                 RPC_RequestViewMap();
@@ -255,10 +273,12 @@ public class Player : NetworkBehaviour
 
         //write view map script here
     }
+
     #endregion
 
 
     #region player ready in lobby
+
     public void ChangeReady()
     {
         if (Object.HasStateAuthority)
@@ -269,8 +289,8 @@ public class Player : NetworkBehaviour
         {
             RPC_RequestChangeReady(!isReady);
         }
-        
-        string msg = isReady? "not ready" : "ready";
+
+        string msg = isReady ? "not ready" : "ready";
         LogManager.Instance.Log($"{playerName} {msg}");
     }
 
@@ -289,9 +309,11 @@ public class Player : NetworkBehaviour
             else isReady = false;
         }
     }
+
     #endregion
 
     #region player turn state
+
     public void ChangeIsPlayerTurn(bool state)
     {
         if ((Runner.IsServer))
@@ -314,9 +336,11 @@ public class Player : NetworkBehaviour
     {
         isPlayerTurn = false;
     }
+
     #endregion
 
     #region player dice logic
+
     public void RollTheDice()
     {
         int dice = Random.Range(1, 7);
@@ -327,5 +351,16 @@ public class Player : NetworkBehaviour
     {
         return diceNum;
     }
-#endregion
+
+    public void SetDiceNum(int diceNum)
+    {
+        this.diceNum = diceNum;
+    }
+
+    #endregion
+
+    public List<IItemStrategy> GetItemList()
+    {
+        return playerItemList;
+    }
 }

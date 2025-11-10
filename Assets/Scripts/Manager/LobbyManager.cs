@@ -114,7 +114,10 @@ public class LobbyManager : MonoBehaviour
 
     private void OnClickStartButton()
     {
-        Debug.Assert(runner.IsServer);
+        if (!runner.IsServer)
+        {
+            return;
+        }
         
         if(isAllPlayerReady == false)
         {

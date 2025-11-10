@@ -18,7 +18,7 @@
         public void OnStateExit()
         {
             LogManager.Instance.Log("Exiting DecidingOrderState");
-            turnManager.ChangeState(new TurnStartState(turnManager));
+            turnManager.ShowTurnStartButton(false);
         }
     }
 }
