@@ -10,6 +10,8 @@ using Manager.TurnState;
 
 public class TurnManager : NetworkBehaviour
 {
+    public static TurnManager Instance { get; private set; }
+    
     private Button turnDecideButton;
     private Button turnStartButton;
 
@@ -23,6 +25,8 @@ public class TurnManager : NetworkBehaviour
 
     private void Awake()
     {
+        Instance = this;
+        
         Button[] buttons = new Button[2];
         buttons = FindObjectsByType<Button>(sortMode: default);
 

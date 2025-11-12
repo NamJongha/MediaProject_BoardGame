@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
@@ -9,7 +10,13 @@ public class ItemUIManager : MonoBehaviour
     [SerializeField] private TargetSelectUIManager targetUI;
     private Player currentPlayer;
     private IItemStrategy selectedItem;
-    
+    public static ItemUIManager Instance { get; private set; }
+
+    private void Awake()
+    {
+        Instance = this;
+    }
+
     public void ShowItemList(Player player)
     {
         currentPlayer = player;

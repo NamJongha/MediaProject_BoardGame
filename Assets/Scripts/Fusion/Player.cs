@@ -22,12 +22,8 @@ public class Player : NetworkBehaviour
 
     private ChangeDetector changeDetector;
     private TurnManager turnManager;
-
-    [SerializeField] private Button playerButtonPrefab;
-    private Button endTurnButtonInstance;
-    private Button diceRollButtonInstance;
-    private Button useItemButtonInstance;
-    private Button viewMapButtonInstance;
+    
+    private PlayerUIManager playerUIManager;
 
     private void Awake()
     
@@ -55,54 +51,10 @@ public class Player : NetworkBehaviour
                 lobby.SetLocalPlayer(this);
                 lobby.UpdateButtonState();
             }
+            
+            playerUIManager =  this.gameObject.GetComponent<PlayerUIManager>();
 
             turnManager = FindFirstObjectByType<TurnManager>();
-
-            #region instantiate buttons
-
-            endTurnButtonInstance = Instantiate(playerButtonPrefab);
-
-            //instantiate player's menu button and rename it
-            diceRollButtonInstance = Instantiate(playerButtonPrefab);
-            diceRollButtonInstance.name = "DiceRollButton";
-            useItemButtonInstance = Instantiate(playerButtonPrefab);
-            useItemButtonInstance.name = "UseItemButton";
-            viewMapButtonInstance = Instantiate(playerButtonPrefab);
-            viewMapButtonInstance.name = "ViewMapButton";
-
-            //Set button's parent to canvas
-            endTurnButtonInstance.transform.SetParent(GameObject.Find("Canvas").transform);
-            diceRollButtonInstance.transform.SetParent(GameObject.Find("Canvas").transform);
-            useItemButtonInstance.transform.SetParent(GameObject.Find("Canvas").transform);
-            viewMapButtonInstance.transform.SetParent(GameObject.Find("Canvas").transform);
-
-            //Set button's position
-            RectTransform rt;
-            rt = endTurnButtonInstance.GetComponent<RectTransform>();
-            rt.anchoredPosition = new Vector2(365, -250);
-            rt = diceRollButtonInstance.GetComponent<RectTransform>();
-            rt.anchoredPosition = new Vector2(365, 170);
-            rt = useItemButtonInstance.GetComponent<RectTransform>();
-            rt.anchoredPosition = new Vector2(365, 120);
-            rt = viewMapButtonInstance.GetComponent<RectTransform>();
-            rt.anchoredPosition = new Vector2(365, 70);
-
-            //Set button's text
-            endTurnButtonInstance.GetComponentInChildren<TMP_Text>().text = "End Turn";
-            diceRollButtonInstance.GetComponentInChildren<TMP_Text>().text = "Roll Dice";
-            useItemButtonInstance.GetComponentInChildren<TMP_Text>().text = "Use Item";
-            viewMapButtonInstance.GetComponentInChildren<TMP_Text>().text = "View Map";
-
-            //Add events on button
-            endTurnButtonInstance.onClick.AddListener(OnEndTurnButtonClicked);
-
-            //Initialize state
-            endTurnButtonInstance.gameObject.SetActive(false);
-            diceRollButtonInstance.gameObject.SetActive(false);
-            useItemButtonInstance.gameObject.SetActive(false);
-            viewMapButtonInstance.gameObject.SetActive(false);
-
-            #endregion
         }
     }
 
@@ -122,14 +74,10 @@ public class Player : NetworkBehaviour
                 if (change == nameof(isPlayerTurn))
                 {
                     Debug.Log("isPlayerTurnChanged");
-                    Debug.Assert(playerButtonPrefab != null);
                     if (Object.HasInputAuthority)
                     {
                         //show button only when the player turn comes
-                        endTurnButtonInstance.gameObject.SetActive(isPlayerTurn);
-                        diceRollButtonInstance.gameObject.SetActive(isPlayerTurn);
-                        useItemButtonInstance.gameObject.SetActive(isPlayerTurn);
-                        viewMapButtonInstance.gameObject.SetActive(isPlayerTurn);
+                        playerUIManager.SetButtonsActive(isPlayerTurn);
                     }
                 }
 
@@ -175,107 +123,6 @@ public class Player : NetworkBehaviour
     {
         playerName = name;
     }
-
-    #region Button Events
-
-    private void OnEndTurnButtonClicked()
-    {
-        if (Object.HasInputAuthority)
-        {
-            if (isPlayerTurn)
-            {
-                RPC_RequestEndTurn();
-            }
-        }
-    }
-
-    [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
-    private void RPC_RequestEndTurn()
-    {
-        if (turnManager == null)
-        {
-            turnManager = FindFirstObjectByType<TurnManager>();
-        }
-
-        turnManager.OnPlayerEndTurn(Object.InputAuthority); //this is for managing turn state in turnManager
-    }
-
-    private void OnDiceRollButtonClicked()
-    {
-        if (Object.HasInputAuthority)
-        {
-            if (isPlayerTurn)
-            {
-                RPC_RequestRollDice();
-            }
-        }
-    }
-
-    [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
-    private void RPC_RequestRollDice()
-    {
-        if (turnManager == null)
-        {
-            turnManager = FindFirstObjectByType<TurnManager>();
-        }
-
-        //write dice roll script here,
-        //this way calls host to roll the dice and synchronize to other clients
-        //if you want to make each client do actual rolling dice, write script in OnDiceRollButtonClicked()
-        //Same for other methods
-        
-        //roll the dice
-        //show the result
-        //set move count according to the stamina (max value of dice reduces 1 everytime the stamina reduces 2)
-        //move player character
-        //reduce stamina
-    }
-
-    private void OnUseItemButtonClicked()
-    {
-        if (Object.HasInputAuthority)
-        {
-            if (isPlayerTurn)
-            {
-                RPC_RequestUseItem();
-            }
-        }
-    }
-
-    [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
-    private void RPC_RequestUseItem()
-    {
-        Debug.Assert(turnManager != null);
-        // 1. Show item list with UI
-        // 2. Choose item with mouse
-        // 3. Show item effect
-        // 4. Return to which button to choose
-    }
-
-    private void OnViewMapButtonClicked()
-    {
-        if (Object.HasInputAuthority)
-        {
-            if (isPlayerTurn)
-            {
-                RPC_RequestViewMap();
-            }
-        }
-    }
-
-    [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
-    private void RPC_RequestViewMap()
-    {
-        if (turnManager == null)
-        {
-            turnManager = FindFirstObjectByType<TurnManager>();
-        }
-
-        //write view map script here
-    }
-
-    #endregion
-
 
     #region player ready in lobby
 
