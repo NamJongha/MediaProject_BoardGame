@@ -5,12 +5,15 @@ using UnityEngine;
 
 public class ItemManager : MonoBehaviour
 {
+    public static ItemManager instance { get; private set; }
+    
     private List<IItemStrategy> itemList = new List<IItemStrategy>();
     private IItemStrategy recoverStaminaItem = new RecoverStaminaItem();
     private IItemStrategy ropeGunItem = new RopeGunItem();
 
     private void Awake()
     {
+        instance = this;
         itemList.Add(recoverStaminaItem);
         itemList.Add(ropeGunItem);
     }

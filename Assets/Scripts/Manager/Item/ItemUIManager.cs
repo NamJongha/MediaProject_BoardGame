@@ -8,6 +8,7 @@ public class ItemUIManager : MonoBehaviour
     [SerializeField] private List<Button> itemButtons;
     [SerializeField] private TargetSelectUIManager targetUI;
     private Player currentPlayer;
+    private IItemStrategy selectedItem;
     
     public void ShowItemList(Player player)
     {
@@ -19,30 +20,51 @@ public class ItemUIManager : MonoBehaviour
     {
         List<IItemStrategy> playerItemList = currentPlayer.GetItemList();
 
+        //플레이어가 소유하고 있는 아이템에 따라 버튼 이미지 및 효과 변경
         for (int i = 0; i < itemButtons.Count; i++)
         {
-            Sprite ItemImage = playerItemList[i].GetItemSprite();
-            itemButtons[i].GetComponent<Image>().sprite = ItemImage;
-            itemButtons[i].gameObject.SetActive(true);
-            itemButtons[i].onClick.RemoveAllListeners();
-            itemButtons[i].onClick.AddListener(() => OnItemButtonClicked(playerItemList[i]));
-
-            if (i > playerItemList.Count)
+            //플레이어 소유 아이템 갯수 이상의 버튼은 비활성화
+            if (i >= playerItemList.Count)
             {
                 itemButtons[i].gameObject.SetActive(false);
+                continue;
             }
+            
+            Sprite ItemImage = playerItemList[i].GetItemSprite(); //GetItemSprite는 Strategy에 정의되어있음
+            itemButtons[i].GetComponent<Image>().sprite = ItemImage;
+            itemButtons[i].gameObject.SetActive(true);
+            
+            itemButtons[i].onClick.RemoveAllListeners();
+            itemButtons[i].onClick.AddListener(() => OnItemButtonClicked(playerItemList[i]));
         }
     }
 
     private void OnItemButtonClicked(IItemStrategy item)
     {
-        //Show target list (button, show player's name), except item used player
+        targetUI.OnTargetSelected -= HandleTargetSelected;
+        targetUI.OnTargetSelected += HandleTargetSelected;
+        
+        //타겟 리스트 표시, 현재 플레이어를 제외하고 표시
         targetUI.ShowTargetList(currentPlayer);
-        Player targetPlayer = new Player();
-        //player with chosen name will be the target
-        targetPlayer = targetUI.GetTargetPlayer();
-        item.UseItem(targetPlayer);
+        
+        selectedItem = item;
+
+        //아이템 선택 시 아이템 선택 버튼 비활성화
+        foreach (Button button in itemButtons)
+        {
+            button.gameObject.SetActive(false);
+        }
+    }
+
+    private void HandleTargetSelected(Player targetPlayer)
+    {
+        Debug.Assert(selectedItem != null);
+        
+        selectedItem.UseItem(targetPlayer);
         UpdateItemListUI();
-        targetUI.ResetTargetPlayer();
+
+        //아이템 효과가 한번만 나타나도록 이벤트 해제 및 selectedItem 비움
+        targetUI.OnTargetSelected -= HandleTargetSelected;
+        selectedItem = null;
     }
 }

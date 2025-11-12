@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Fusion;
 using TMPro;
@@ -9,7 +10,8 @@ public class TargetSelectUIManager : MonoBehaviour
     [SerializeField] private List<Button> targetListButtons;
     private Dictionary<PlayerRef, NetworkObject> playerList;
     private Player currentPlayer;
-    private Player targetPlayer;
+    
+    public event Action<Player> OnTargetSelected;
 
     private void Awake()
     {
@@ -23,34 +25,36 @@ public class TargetSelectUIManager : MonoBehaviour
 
     private void UpdateTargetList(Player curPlayer)
     {
+        Debug.Assert(playerList.Count <= 4 && playerList != null);
+        
         foreach (Button button in targetListButtons)
         {
             button.onClick.RemoveAllListeners();
         }
         
         currentPlayer = curPlayer;
-        int playerListIndex = 0;
+        int buttonIndex = 0;
         
-        foreach (KeyValuePair<PlayerRef, NetworkObject> player in playerList)
+        foreach (KeyValuePair<PlayerRef, NetworkObject> playerKVP in playerList)
         {
-            Debug.Assert(playerList.Count <= 4 && playerList != null);
-            if (player.Value.GetComponent<Player>().playerName == currentPlayer.playerName)
+            Player player = playerKVP.Value.GetComponent<Player>();
+            
+            if (player.playerName == currentPlayer.playerName)
             {
-                playerListIndex++;
+                continue;
             }
+            
+            Debug.Assert(buttonIndex < targetListButtons.Count, "buttonIndex >= targetListButtons.Count");
 
-            else
-            {
-                Button targetButton = targetListButtons[playerListIndex];
-                targetButton.GetComponent<TextMeshProUGUI>().text = player.Value.GetComponent<Player>().playerName.ToString();
-                targetButton.onClick.AddListener(() => OnTargetButtonClicked(targetButton));
-                playerListIndex++;
-            }
-        }
-        
-        foreach (Button button in targetListButtons)
-        {
-            button.gameObject.SetActive(true);
+            Button targetButton = targetListButtons[buttonIndex];
+            targetButton.gameObject.SetActive(true);
+            targetButton.GetComponentInChildren<TextMeshProUGUI>().text = player.playerName.ToString();
+            targetButton.onClick.RemoveAllListeners();
+
+            Player targetPlayer = player;
+            targetButton.onClick.AddListener(() => OnTargetButtonClicked(targetPlayer));
+            
+            buttonIndex++;
         }
     }
 
@@ -59,43 +63,17 @@ public class TargetSelectUIManager : MonoBehaviour
         UpdateTargetList(curPlayer);
     }
 
-    private void OnTargetButtonClicked(Button btn)
+    private void OnTargetButtonClicked(Player targetPlayer)
     {
         //if target is selected
         //return target player's reference or network object or Player component
 
-        TargetSelected(btn);
+        OnTargetSelected?.Invoke(targetPlayer);
+        
+        //타겟 선택 시 타겟 선택 버튼 비활성화
         foreach (Button button in targetListButtons)
         {
             button.gameObject.SetActive(false);
         }
-    }
-
-    private void TargetSelected(Button targetButton)
-    {
-        string playerName = targetButton.GetComponent<TextMeshProUGUI>().text;
-        Player targetPlayer = new Player();
-        
-        foreach (KeyValuePair<PlayerRef, NetworkObject> player in playerList)
-        {
-            NetworkObject playerObject = player.Value;
-            if (playerObject.GetComponent<Player>().playerName == playerName)
-            {
-                targetPlayer = playerObject.GetComponent<Player>();
-                break;
-            }
-        }
-
-        this.targetPlayer = targetPlayer;
-    }
-
-    public Player GetTargetPlayer()
-    {
-        return targetPlayer;
-    }
-
-    public void ResetTargetPlayer()
-    {
-        targetPlayer = null;
     }
 }

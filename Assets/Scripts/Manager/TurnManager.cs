@@ -137,6 +137,8 @@ public class TurnManager : NetworkBehaviour
         Debug.Log(curPlayerRef + " turn started");
         LogManager.Instance.Log($"{curPlayerObj.GetComponent<Player>().playerName} turn started");
         
+        CameraManager.Instance.SetPlayerCamera(curPlayerObj);
+        
         ChangeState(new TurnActionState(this)); // turn start state -> turn action state
     }
     
