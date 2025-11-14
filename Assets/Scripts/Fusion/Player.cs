@@ -7,11 +7,14 @@ using UnityEngine.UI;
 public class Player : NetworkBehaviour
 {
     private NetworkCharacterController _cc;
-
+    private const int MaxStamina = 12;
+    private const int MinStamina = 0;
     [Networked] public bool isReady { get; set; }
     [Networked] public bool isPlayerTurn { get; set; }
     [Networked] public NetworkString<_16> playerName { get; set; }
-    [Networked] public int playerStamina { get; set; } = 12;
+    [Networked] public int playerStamina { get; set; } = MaxStamina;
+    [Networked] public int chosenBranchIndex { get; set; }
+    [Networked] public NetworkBool branchSelected { get; set; }
 
     [SerializeField] private GameObject nameObject; //text to show name above the player
     private TextMeshProUGUI nameText;
@@ -47,6 +50,8 @@ public class Player : NetworkBehaviour
         {
             string _playerName = PlayerPrefs.GetString("playerName", $"Player_{Object.InputAuthority.PlayerId}"); //second variable is default value
             RPC_SetPlayerName(_playerName);
+            turnManager = FindFirstObjectByType<TurnManager>();
+            playerStamina = MaxStamina;
 
             LobbyManager lobby = FindFirstObjectByType<LobbyManager>();
             if (lobby != null)
@@ -56,8 +61,7 @@ public class Player : NetworkBehaviour
                 lobby.UpdateButtonState();
             }
 
-            turnManager = FindFirstObjectByType<TurnManager>();
-
+            
             #region instantiate buttons
 
             endTurnButtonInstance = Instantiate(playerButtonPrefab);
@@ -218,19 +222,33 @@ public class Player : NetworkBehaviour
         {
             turnManager = FindFirstObjectByType<TurnManager>();
         }
+        int staminaLossCount = (MaxStamina - playerStamina) / 2;
+        int maxDiceValue = Mathf.Max(1, 6 - staminaLossCount);
 
-        //write dice roll script here,
-        //this way calls host to roll the dice and synchronize to other clients
-        //if you want to make each client do actual rolling dice, write script in OnDiceRollButtonClicked()
-        //Same for other methods
+        int diceValue = UnityEngine.Random.Range(1, maxDiceValue + 1);
+
+        LogManager.Instance.Log(
+            $"{playerName} rolled {diceValue} (max: {maxDiceValue}, stamina: {playerStamina})"
+        );
         
-        //roll the dice
-        //show the result
-        //set move count according to the stamina (max value of dice reduces 1 everytime the stamina reduces 2)
-        //move player character
-        //reduce stamina
+        // Start moving the player
+        PlayerMover mover = GetComponent<PlayerMover>();
+
+        // MoveStepsAndFinishTurn(steps, player, turnManager)
+        mover.StartCoroutine(mover.MoveStepsAndFinishTurn(diceValue, this, turnManager));
+        
+        // Stamina decreases by 1 each turn
+        playerStamina = Mathf.Max(0, playerStamina - 1);
+
+        // Update Stamina Text and UI
+        LogManager.Instance.Log($"{playerName} stamina is now {playerStamina}");
     }
 
+    public void RequestDiceRoll()
+    {
+        OnDiceRollButtonClicked();
+    }
+    
     private void OnUseItemButtonClicked()
     {
         if (Object.HasInputAuthority)
@@ -246,10 +264,6 @@ public class Player : NetworkBehaviour
     private void RPC_RequestUseItem()
     {
         Debug.Assert(turnManager != null);
-        // 1. Show item list with UI
-        // 2. Choose item with mouse
-        // 3. Show item effect
-        // 4. Return to which button to choose
     }
 
     private void OnViewMapButtonClicked()
@@ -275,7 +289,6 @@ public class Player : NetworkBehaviour
     }
 
     #endregion
-
 
     #region player ready in lobby
 
@@ -362,5 +375,17 @@ public class Player : NetworkBehaviour
     public List<IItemStrategy> GetItemList()
     {
         return playerItemList;
+    }
+    
+    public void ModifyStamina(int amount)
+    {
+        playerStamina = Mathf.Clamp(playerStamina + amount, MinStamina, MaxStamina);
+    }
+    
+    [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
+    public void RPC_ChooseBranch(int index)
+    {
+        chosenBranchIndex = index;
+        branchSelected = true;
     }
 }

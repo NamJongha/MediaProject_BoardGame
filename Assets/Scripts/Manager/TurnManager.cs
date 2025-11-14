@@ -1,70 +1,166 @@
-using UnityEngine;
-using Fusion;
-using UnityEngine.UI;
-using System.Runtime.InteropServices;
-using NUnit.Framework;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Collections;
+using Fusion;
 using Manager.TurnState;
+using UnityEngine;
+using UnityEngine.UI;
 
 public class TurnManager : NetworkBehaviour
 {
+    private ITurnState curTurnState;
+
+    private GameManager gameManager;
+    
+    private Button rollDiceButton;
     private Button turnDecideButton;
     private Button turnStartButton;
+    private Button useItemButton;
+    private Button viewMapButton;
 
-    [Networked, Capacity(4)] public NetworkArray<PlayerRef> PlayerOrder => default;
+    [Networked] [Capacity(4)] public NetworkArray<PlayerRef> PlayerOrder => default;
     [Networked] public TurnState curState { get; set; }
     [Networked] public int curTurnIndex { get; set; } = -1;
-
-    private ITurnState curTurnState;
-    
-    private GameManager gameManager;
+    private bool _initialized = false;
 
     private void Awake()
     {
-        Button[] buttons = new Button[2];
-        buttons = FindObjectsByType<Button>(sortMode: default);
+        var buttons = new Button[2];
+        buttons = FindObjectsByType<Button>(default);
 
         foreach (var btn in buttons)
-        {
-            if (btn.name == "OrderDecideButton") turnDecideButton = btn;
+            if (btn.name == "OrderDecideButton")
+                turnDecideButton = btn;
             else if (btn.name == "TurnStartButton") turnStartButton = btn;
-        }
     }
 
     public override void Spawned()
     {
         base.Spawned();
 
-        turnDecideButton.onClick.AddListener(OnDecideButtonClicked);
-        turnStartButton.onClick.AddListener(OnTurnStartButtonClicked);
+        Debug.Log("TurnManager: Spawned()");
+
+        curTurnState = null;
 
         gameManager = FindFirstObjectByType<GameManager>();
 
-        ResetOrder();
+        StartCoroutine(WaitAndBindInitialButtons());
 
-        if (Object.HasStateAuthority)
-        {
-            StartCoroutine(DelayedInitState());
-        }
-        else
-        {
+        ResetOrder();
+        
             ShowTurnDecideButton(false);
             ShowTurnStartButton(false);
-        }
     }
+    private IEnumerator WaitAndBindInitialButtons()
+    {
+        yield return new WaitForSeconds(0.5f);
+
+        for (int i = 0; i < 50; i++)
+        {
+            var buttons = FindObjectsByType<Button>(FindObjectsInactive.Include, FindObjectsSortMode.None);
+
+            foreach (var btn in buttons)
+            {
+                if (btn.name == "TurnDecideButton")
+                {
+                    turnDecideButton = btn;
+                    turnDecideButton.onClick.RemoveAllListeners();
+                    turnDecideButton.onClick.AddListener(OnDecideButtonClicked);
+                    Debug.Log("[TM] TurnDecideButton connected");
+                }
+
+                if (btn.name == "TurnStartButton")
+                {
+                    turnStartButton = btn;
+                    turnStartButton.onClick.RemoveAllListeners();
+                    turnStartButton.onClick.AddListener(OnTurnStartButtonClicked);
+                    Debug.Log("[TM] TurnStartButton connected");
+                }
+            }
+
+            // 필수 버튼 둘 다 연결되었으면 종료
+            if (turnDecideButton != null && turnStartButton != null)
+            {
+                Debug.Log("[TM] Essential UI buttons connected");
+                yield break;
+            }
+
+            yield return new WaitForSeconds(0.1f);
+        }
+
+        Debug.LogWarning("[TM] Timeout binding essential buttons!");
+    }
+
+    private IEnumerator WaitAndBindRuntimeButtons()
+    {
+        Debug.Log("[TM] WaitAndBindRuntimeButtons START");
+
+        // UIManager가 버튼들을 생성할 시간을 기다린다
+        for (int i = 0; i < 50; i++)
+        {
+            var buttons = FindObjectsByType<Button>(FindObjectsInactive.Include, FindObjectsSortMode.None);
+
+            foreach (var btn in buttons)
+            {
+                switch (btn.name)
+                {
+                    case "DiceRollButton":
+                        rollDiceButton = btn;
+                        rollDiceButton.onClick.RemoveAllListeners();
+                        rollDiceButton.onClick.AddListener(OnClickRollDice);
+                        Debug.Log("[TM] DiceRollButton connected");
+                        break;
+
+                    case "UseItemButton":
+                        useItemButton = btn;
+                        useItemButton.onClick.RemoveAllListeners();
+                        useItemButton.onClick.AddListener(OnClickUseItem);
+                        Debug.Log("[TM] UseItemButton connected");
+                        break;
+
+                    case "ViewMapButton":
+                        viewMapButton = btn;
+                        viewMapButton.onClick.RemoveAllListeners();
+                        viewMapButton.onClick.AddListener(OnClickViewMap);
+                        Debug.Log("[TM] ViewMapButton connected");
+                        break;
+                }
+            }
+
+            if (rollDiceButton != null && useItemButton != null && viewMapButton != null)
+            {
+                Debug.Log("[TM] Runtime UI buttons connected!");
+                yield break;
+            }
+
+            yield return new WaitForSeconds(0.1f);
+        }
+
+        Debug.LogWarning("[TM] Timeout binding runtime buttons!");
+    }
+
 
     private IEnumerator DelayedInitState()
     {
-        yield return null;
-        yield return null;
+        yield return new WaitForSeconds(0.2f);
 
-        Debug.Log("TurnManager: DelayedInitState called, setting to WaitingForOrder");
+        Debug.Log("[TM] DelayedInitState → WaitingForOrder");   
 
         curTurnState = new WaitingForOrderState(this);
-        curTurnState.OnStateEnter(); // waiting for order, initialize
+        curTurnState.OnStateEnter();
     }
+
+    
+    public void InitTurnFlow()
+    {
+        if (_initialized)
+        {
+            return;
+        }
+
+        _initialized = true;
+        StartCoroutine(DelayedInitState());
+    }           
 
     private void OnDecideButtonClicked()
     {
@@ -81,6 +177,47 @@ public class TurnManager : NetworkBehaviour
         {
             ChangeState(new TurnStartState(this)); // deciding turn state -> turn start state
             StartTurn();
+            StartCoroutine(WaitAndBindRuntimeButtons());
+        }
+    }
+
+    private Player GetCurrentTurnPlayer()
+    {
+        foreach (var kvp in gameManager.GetPlayersList())
+        {
+            var p = kvp.Value.GetComponent<Player>();
+            if (p.isPlayerTurn)
+                return p;
+        }
+
+        return null;
+    }
+
+    private void OnClickRollDice()
+    {
+        LogManager.Instance.Log("Roll Dice Button Click detected");
+
+        var current = GetCurrentTurnPlayer();
+        if (current != null) current.RequestDiceRoll();
+    }
+
+    private void OnClickUseItem()
+    {
+        LogManager.Instance.Log("Use Item Button Click detected");
+
+        var current = GetCurrentTurnPlayer();
+        if (current != null)
+        {
+        }
+    }
+
+    private void OnClickViewMap()
+    {
+        LogManager.Instance.Log("View Map Button Click detected");
+
+        var current = GetCurrentTurnPlayer();
+        if (current != null)
+        {
         }
     }
 
@@ -89,15 +226,15 @@ public class TurnManager : NetworkBehaviour
         //each player roll the dice
         //after all the players roll it, order it from big num to small num
         //big number start first
-        
-        List<(PlayerRef player, int dice)> result = new List<(PlayerRef, int)>();
+
+        List<(PlayerRef player, int dice)> result = new();
 
         foreach (var kvp in gameManager.GetPlayersList())
         {
             kvp.Value.GetComponent<Player>().RollTheDice();
 
-            PlayerRef playerRef = kvp.Key;
-            int dice = kvp.Value.GetComponent<Player>().GetDiceNum();
+            var playerRef = kvp.Key;
+            var dice = kvp.Value.GetComponent<Player>().GetDiceNum();
 
             LogManager.Instance.Log($"player {kvp.Value.GetComponent<Player>().playerName} dice number is {dice}");
             result.Add((playerRef, dice));
@@ -105,15 +242,15 @@ public class TurnManager : NetworkBehaviour
 
         result.Sort((player1, player2) => player2.dice.CompareTo(player1.dice));
 
-        string orderString = "";
-        for (int i = 0; i < Runner.ActivePlayers.Count(); i++)
+        var orderString = "";
+        for (var i = 0; i < Runner.ActivePlayers.Count(); i++)
         {
             PlayerOrder.Set(i, result[i].player);
             Debug.Log(i + " order player: " + PlayerOrder[i]);
-            NetworkObject playerObject = gameManager.GetPlayersList().GetValueOrDefault(PlayerOrder[i]);
-            orderString = $"{orderString} {(i+1)}: {playerObject.GetComponent<Player>().playerName}";
+            var playerObject = gameManager.GetPlayersList().GetValueOrDefault(PlayerOrder[i]);
+            orderString = $"{orderString} {i + 1}: {playerObject.GetComponent<Player>().playerName}";
         }
-        
+
         LogManager.Instance.Log($"Set order is {orderString}");
     }
 
@@ -123,25 +260,23 @@ public class TurnManager : NetworkBehaviour
 
         if (curTurnIndex == -1) curTurnIndex = 0;
         else
-        {
             curTurnIndex = (curTurnIndex + 1) % Runner.ActivePlayers.Count();
-        }
 
-        PlayerRef curPlayerRef = PlayerOrder.Get(curTurnIndex);
+        var curPlayerRef = PlayerOrder.Get(curTurnIndex);
         Debug.Log("Cur Turn index: " + curTurnIndex);
 
-        NetworkObject curPlayerObj = Runner.GetPlayerObject(curPlayerRef);
+        var curPlayerObj = Runner.GetPlayerObject(curPlayerRef);
         Debug.Log("Cur Player Obj: + " + curPlayerObj.gameObject.name);
 
         curPlayerObj.GetComponent<Player>().ChangeIsPlayerTurn(true);
         Debug.Log(curPlayerRef + " turn started");
         LogManager.Instance.Log($"{curPlayerObj.GetComponent<Player>().playerName} turn started");
-        
+
         CameraManager.Instance.SetPlayerCamera(curPlayerObj);
-        
+
         ChangeState(new TurnActionState(this)); // turn start state -> turn action state
     }
-    
+
     private IEnumerator DelayedStartTurn(float delay)
     {
         yield return new WaitForSeconds(delay);
@@ -149,12 +284,10 @@ public class TurnManager : NetworkBehaviour
         if (Object.HasStateAuthority)
         {
             foreach (var kvp in gameManager.GetPlayersList())
-            {
                 kvp.Value.GetComponent<Player>().ChangeIsPlayerTurn(false);
-            }
 
             yield return null; // wait for one frame to load it
-            
+
             StartTurn(); // restart the turn after end (next player)
         }
     }
@@ -169,18 +302,15 @@ public class TurnManager : NetworkBehaviour
 
     private void EndTurn()
     {
-        PlayerRef curPlayerRef = PlayerOrder.Get(curTurnIndex);
-        NetworkObject curPlayerObj = Runner.GetPlayerObject(curPlayerRef);
+        var curPlayerRef = PlayerOrder.Get(curTurnIndex);
+        var curPlayerObj = Runner.GetPlayerObject(curPlayerRef);
 
         curPlayerObj.GetComponent<Player>().ChangeIsPlayerTurn(false);
-        
+
         LogManager.Instance.Log($"{curPlayerObj.GetComponent<Player>().playerName} ended turn");
 
-        if (Object.HasStateAuthority)
-        {
-            StartCoroutine(DelayedStartTurn(1.0f));
-        }
-        
+        if (Object.HasStateAuthority) StartCoroutine(DelayedStartTurn(1.0f));
+
         ChangeState(new TurnStartState(this)); // turn end state -> turn start state
     }
 
@@ -188,7 +318,7 @@ public class TurnManager : NetworkBehaviour
     {
         PlayerOrder.Clear();
     }
-    
+
     public void ShowTurnDecideButton(bool show)
     {
         turnDecideButton.gameObject.SetActive(show);

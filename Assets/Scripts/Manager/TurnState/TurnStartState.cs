@@ -14,6 +14,16 @@
             LogManager.Instance.Log("Entering TurnStartState");
             turnManager.ShowTurnDecideButton(false);
             turnManager.ShowTurnStartButton(false);
+            /*
+            Player currentPlayer = turnManager.GetCurrentTurnPlayer();
+
+            if (currentPlayer != null)
+            {
+                currentPlayer.StartDiceRoll();
+            }
+            
+            turnManager.ChangeState(new TurnActionState(turnManager));
+            */
         }
 
         public void OnStateExit()
