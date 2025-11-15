@@ -34764,52 +34764,20 @@ MonoBehaviour:
   m_GameObject: {fileID: 2147414232}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7b282ada662147347958eeb5f41f0f7b, type: 3}
+  m_Script: {fileID: 11500000, guid: 133e662fc5825c141bf879dbd87ca959, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BoardGenerator
   pathGenerator: {fileID: 1547145346}
   specialTileGenerator: {fileID: 311960067}
   tileParent: {fileID: 1095582050}
   defaultNodePrefab: {fileID: 1571337867411676, guid: 75267c91140579f418be9bfb5bccdd43, type: 3}
-  mainPathLength: 80
+  mainPathLength: 60
   startCoord: {x: 0, y: 0}
-  endCoord: {x: 1280, y: 0}
+  endCoord: {x: 200, y: 0}
   spacingMultiplier: 1.1
   branchChance: 0.2
-  branchInterval: 15
-  terrainRegions:
-  - terrainType: 1
-    area:
-      x: 0
-      y: -30
-      width: 290
-      height: 61
-    specialTileCount: 5
-    tilePrefab: {fileID: 1084359962900834, guid: c4ad25f8d2d4bc04abe1567ff84a0adc, type: 3}
-  - terrainType: 2
-    area:
-      x: 291
-      y: -30
-      width: 370
-      height: 61
-    specialTileCount: 5
-    tilePrefab: {fileID: 1981032831957248, guid: a39be3add4eeffa4cbf77f6011e3d65e, type: 3}
-  - terrainType: 4
-    area:
-      x: 641
-      y: -30
-      width: 320
-      height: 61
-    specialTileCount: 5
-    tilePrefab: {fileID: 1561560182698024, guid: 1fd777e2db24c7e4399f2a7dbb1d77fd, type: 3}
-  - terrainType: 3
-    area:
-      x: 961
-      y: -30
-      width: 320
-      height: 61
-    specialTileCount: 5
-    tilePrefab: {fileID: 1844309745156320, guid: d51a0c35ede15ba41bce747e644670c7, type: 3}
+  branchInterval: 10
+  terrainRegions: []
   startNode: {fileID: 0}
   spawnNodes: []
 --- !u!1660057539 &9223372036854775807

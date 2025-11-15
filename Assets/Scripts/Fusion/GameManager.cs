@@ -172,6 +172,10 @@ public class GameManager : MonoBehaviour, INetworkRunnerCallbacks
         }
 
         Debug.Log($"[GM] Board ready, respawning players. SpawnPoints={spawnPoints.Length}");
+        
+        //내가 카페에서 이미 등록되어있는거에서 꺼내온다 했었는데, 내 로컬 코드 보니까 그냥 이걸 지우고 다시 씌우더라;;
+        _spawnedCharacters.Clear();
+        
         foreach (var player in runner.ActivePlayers)
         {
             var index = Mathf.Clamp(player.PlayerId - 1, 0, spawnPoints.Length - 1);
@@ -179,7 +183,11 @@ public class GameManager : MonoBehaviour, INetworkRunnerCallbacks
             
             // 새로 스폰
             var newObj = _runner.Spawn(_playerPrefab, pos, Quaternion.identity, player);
-            _spawnedCharacters[player] = newObj;
+            
+            // 이부분 _spawnedCharacters[player] = newObj;로 되어있음
+            // => 씬이 바뀔 때 기존 오브젝트가 디스폰되는데, Runner에 등록된 플레이어와 오브젝트 쌍은 변하지 않으면 문제 있을 수 있음
+            runner.SetPlayerObject(player, newObj);
+            _spawnedCharacters.Add(player, newObj);
 
             Debug.Log($"Respawned Player {player.PlayerId} at {pos}");
         }
@@ -208,9 +216,9 @@ public class GameManager : MonoBehaviour, INetworkRunnerCallbacks
         }
 
         // TurnManager 생성
-        var tm = Instantiate(turnManagerPrefab);
-        tm.transform.SetParent(GameObject.Find("TurnManagerRoot").transform);
-        Debug.Log("[GM] TurnManager spawned under Canvas.");
+        //var tm = Instantiate(turnManagerPrefab);
+        //tm.transform.SetParent(GameObject.Find("TurnManagerRoot").transform);
+        //Debug.Log("[GM] TurnManager spawned under Canvas.");
     }
 
     private void OnBoardReady()

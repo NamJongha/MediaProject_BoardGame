@@ -17,6 +17,12 @@ public class TurnManager : NetworkBehaviour
     private Button turnStartButton;
     private Button useItemButton;
     private Button viewMapButton;
+    
+    private WaitingForOrderState waitingForOrderState;
+    private DecidingOrderState  decidingOrderState;
+    private TurnStartState turnStartState;
+    private TurnActionState  turnActionState;
+    private TurnEndState  turnEndState;
 
     [Networked] [Capacity(4)] public NetworkArray<PlayerRef> PlayerOrder => default;
     [Networked] public TurnState curState { get; set; }
@@ -25,13 +31,24 @@ public class TurnManager : NetworkBehaviour
 
     private void Awake()
     {
-        var buttons = new Button[2];
-        buttons = FindObjectsByType<Button>(default);
+        //var buttons = new Button[2];
+        //buttons = FindObjectsByType<Button>(default);
+//
+        //foreach (var btn in buttons)
+        //    if (btn.name == "OrderDecideButton")
+        //    {
+        //        turnDecideButton = btn;
+        //    }
+        //    else if (btn.name == "TurnStartButton") 
+        //    {
+        //        turnStartButton = btn;
+        //    }
 
-        foreach (var btn in buttons)
-            if (btn.name == "OrderDecideButton")
-                turnDecideButton = btn;
-            else if (btn.name == "TurnStartButton") turnStartButton = btn;
+        waitingForOrderState = new WaitingForOrderState(this);
+        decidingOrderState = new DecidingOrderState(this);
+        turnStartState = new TurnStartState(this);
+        turnActionState = new TurnActionState(this);
+        turnEndState = new TurnEndState(this);
     }
 
     public override void Spawned()
@@ -40,16 +57,13 @@ public class TurnManager : NetworkBehaviour
 
         Debug.Log("TurnManager: Spawned()");
 
-        curTurnState = null;
+        curTurnState = waitingForOrderState;
 
         gameManager = FindFirstObjectByType<GameManager>();
 
         StartCoroutine(WaitAndBindInitialButtons());
 
         ResetOrder();
-        
-            ShowTurnDecideButton(false);
-            ShowTurnStartButton(false);
     }
     private IEnumerator WaitAndBindInitialButtons()
     {
@@ -61,7 +75,7 @@ public class TurnManager : NetworkBehaviour
 
             foreach (var btn in buttons)
             {
-                if (btn.name == "TurnDecideButton")
+                if (btn.name == "OrderDecideButton") //its name was wrong: turnDecideButton -> OrderDecideButton
                 {
                     turnDecideButton = btn;
                     turnDecideButton.onClick.RemoveAllListeners();
@@ -166,7 +180,7 @@ public class TurnManager : NetworkBehaviour
     {
         if (Object.HasStateAuthority)
         {
-            ChangeState(new DecidingOrderState(this)); // waiting for order state -> deciding turn state
+            ChangeState(decidingOrderState); // waiting for order state -> deciding turn state
             DecideTurnOrder();
         }
     }
@@ -175,7 +189,7 @@ public class TurnManager : NetworkBehaviour
     {
         if (Object.HasStateAuthority)
         {
-            ChangeState(new TurnStartState(this)); // deciding turn state -> turn start state
+            ChangeState(turnStartState); // deciding turn state -> turn start state
             StartTurn();
             StartCoroutine(WaitAndBindRuntimeButtons());
         }
@@ -262,10 +276,10 @@ public class TurnManager : NetworkBehaviour
         else
             curTurnIndex = (curTurnIndex + 1) % Runner.ActivePlayers.Count();
 
-        var curPlayerRef = PlayerOrder.Get(curTurnIndex);
+        PlayerRef curPlayerRef = PlayerOrder.Get(curTurnIndex);
         Debug.Log("Cur Turn index: " + curTurnIndex);
 
-        var curPlayerObj = Runner.GetPlayerObject(curPlayerRef);
+        NetworkObject curPlayerObj = Runner.GetPlayerObject(curPlayerRef);
         Debug.Log("Cur Player Obj: + " + curPlayerObj.gameObject.name);
 
         curPlayerObj.GetComponent<Player>().ChangeIsPlayerTurn(true);
@@ -274,7 +288,7 @@ public class TurnManager : NetworkBehaviour
 
         CameraManager.Instance.SetPlayerCamera(curPlayerObj);
 
-        ChangeState(new TurnActionState(this)); // turn start state -> turn action state
+        ChangeState(turnActionState); // turn start state -> turn action state
     }
 
     private IEnumerator DelayedStartTurn(float delay)
@@ -296,7 +310,7 @@ public class TurnManager : NetworkBehaviour
     {
         Debug.Assert(Object.HasStateAuthority && PlayerOrder.Get(curTurnIndex) == player);
 
-        ChangeState(new TurnEndState(this));
+        ChangeState(turnEndState);
         EndTurn();
     }
 
@@ -311,7 +325,7 @@ public class TurnManager : NetworkBehaviour
 
         if (Object.HasStateAuthority) StartCoroutine(DelayedStartTurn(1.0f));
 
-        ChangeState(new TurnStartState(this)); // turn end state -> turn start state
+        ChangeState(turnStartState); // turn end state -> turn start state
     }
 
     public void ResetOrder()

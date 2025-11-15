@@ -32,7 +32,7 @@ public class PlayerMover : MonoBehaviour
     
     public IEnumerator MoveSteps(int steps, Player player)
     {
-        if (currentNode == null)
+        if (currentNode == null) //이 부분에서 진행 안됨
         {
             Debug.LogError("currentNode가 없습니다. 플레이어 스폰 상태 확인 필요.");
             yield break;
