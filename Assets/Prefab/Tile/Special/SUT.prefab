@@ -108,6 +108,7 @@ MonoBehaviour:
   terrainType: 0
   nodeType: 2
   isBranchNode: 0
+  isSpawnNode: 0
   nextNodes: []
   debugColor: {r: 1, g: 1, b: 1, a: 1}
 --- !u!65 &-3616179289744213291
@@ -142,7 +143,6 @@ GameObject:
   - component: {fileID: 8948177118166778033}
   - component: {fileID: 736857305482682818}
   - component: {fileID: 4120516198429689274}
-  - component: {fileID: 7171437945965278019}
   m_Layer: 0
   m_Name: Collider
   m_TagString: Untagged
@@ -180,7 +180,7 @@ BoxCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
@@ -199,21 +199,3 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SpecialTile
   effect: {fileID: 11400000, guid: 665131db4645b644ba19efa1103c1962, type: 2}
---- !u!114 &7171437945965278019
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8948843256175583508}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: -1552182283, guid: e725a070cec140c4caffb81624c8c787, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Fusion.Runtime.dll::Fusion.NetworkObject
-  SortKey: 0
-  ObjectInterest: 1
-  Flags: 262144
-  NestedObjects: []
-  NetworkedBehaviours: []
-  ForceRemoteRenderTimeframe: 0

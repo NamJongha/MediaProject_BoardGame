@@ -176,6 +176,13 @@ public class GameManager : MonoBehaviour, INetworkRunnerCallbacks
         //내가 카페에서 이미 등록되어있는거에서 꺼내온다 했었는데, 내 로컬 코드 보니까 그냥 이걸 지우고 다시 씌우더라;;
         _spawnedCharacters.Clear();
         
+        var startNode = BoardGenerator.Instance.GetStartNode();
+        if (startNode == null)
+        {
+            Debug.LogError("[GM] StartNode is null. BoardGenerator didn't initialize properly.");
+            yield break;
+        }
+        
         foreach (var player in runner.ActivePlayers)
         {
             var index = Mathf.Clamp(player.PlayerId - 1, 0, spawnPoints.Length - 1);
@@ -188,6 +195,17 @@ public class GameManager : MonoBehaviour, INetworkRunnerCallbacks
             // => 씬이 바뀔 때 기존 오브젝트가 디스폰되는데, Runner에 등록된 플레이어와 오브젝트 쌍은 변하지 않으면 문제 있을 수 있음
             runner.SetPlayerObject(player, newObj);
             _spawnedCharacters.Add(player, newObj);
+            
+            var playerScript = newObj.GetComponent<Player>();
+            if (playerScript != null)
+            {
+                playerScript.currentNodeId = startNode.id;
+                Debug.Log($"Player {player.PlayerId} currentNode initialized to: {startNode.name}");
+            }
+            else
+            {
+                Debug.LogError($"Player script not found on player {player.PlayerId}");
+            }
 
             Debug.Log($"Respawned Player {player.PlayerId} at {pos}");
         }
@@ -215,18 +233,12 @@ public class GameManager : MonoBehaviour, INetworkRunnerCallbacks
             Debug.Log("[GM] Old TurnManager destroyed");
         }
 
-        // TurnManager 생성
-        //var tm = Instantiate(turnManagerPrefab);
-        //tm.transform.SetParent(GameObject.Find("TurnManagerRoot").transform);
-        //Debug.Log("[GM] TurnManager spawned under Canvas.");
     }
 
     private void OnBoardReady()
     {
         boardReady = true;
         Debug.Log("[GM] Board ready.");
-
-        //StartCoroutine(InitTurnManagerWhenPlayersReady());
     }
     
     [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
@@ -238,115 +250,6 @@ public class GameManager : MonoBehaviour, INetworkRunnerCallbacks
         // Seed를 받으면 즉시 보드 생성
         BoardGenerator.Instance.GenerateBoard(seed);
     }
-
-/*
-    private IEnumerator InitTurnManagerWhenPlayersReady()
-    {
-        // Runner 또는 플레이어 스폰 완료 대기
-        while (_runner == null || _spawnedCharacters.Count != _runner.ActivePlayers.Count())
-            yield return null;
-
-        Debug.Log("[GM] All players spawned. Initializing TurnManager...");
-
-        if (_turnManager == null)
-        {
-            Debug.LogError("[GM] ERROR: TurnManager is NULL!");
-            yield break;
-        }
-
-        _turnManager.InitTurnFlow();
-    }
-
-    private IEnumerator SpawnPlayerWhenBoardReady(PlayerRef player)
-    {
-        while (!boardReady)
-            yield return null;
-
-        var bg = BoardGenerator.Instance;
-        if (bg == null)
-        {
-            Debug.LogError("[GM] BoardGenerator.Instance 가 null 입니다!");
-            yield break;
-        }
-
-        if (bg.spawnNodes == null || bg.spawnNodes.Count == 0)
-        {
-            Debug.LogError("[GM] SpawnNodes 가 비어 있습니다!");
-            yield break;
-        }
-
-        var index = player.RawEncoded % bg.spawnNodes.Count;
-
-        var spawnNode = bg.spawnNodes[index];
-
-        var spawnPosition = spawnNode.transform.position + new Vector3(0, 2f, 0);
-
-        var playerObj = _runner.Spawn(_playerPrefab, spawnPosition, Quaternion.identity, player);
-
-        _spawnedCharacters[player] = playerObj;
-        Debug.Log($"[SPAWN DEBUG] Requested Spawn Pos = {spawnPosition}");
-        Debug.Log($"Spawned player {player.PlayerId} at spawn node {spawnNode.id}");
-    }
-
-    private void SpawnPlayerInLobby(NetworkRunner runner, PlayerRef player)
-    {
-        var spawnPosition = Vector3.zero;
-
-        for (var i = 0; i < spawnPoints.Length; i++)
-        {
-            if (spawnPoints[i] == null)
-                spawnPoints = GameObject.FindGameObjectsWithTag("SpawnPoint")
-                    .OrderBy(sp => sp.name).ToArray();
-
-            var checker = spawnPoints[i].GetComponent<SpawnPointChecker>();
-            if (!checker.getSpawned())
-            {
-                spawnPosition = spawnPoints[i].transform.position + Vector3.up * 2.5f;
-                checker.setSpawned();
-                break;
-            }
-        }
-
-        var networkPlayerObject = runner.Spawn(_playerPrefab, spawnPosition, Quaternion.identity, player);
-        networkPlayerObject.GetComponent<Player>().resetReady();
-
-        _spawnedCharacters[player] = networkPlayerObject;
-
-        Debug.Log($"Lobby Spawn: Player {player.PlayerId} at {spawnPosition}");
-    }
-
-    
-    private void SpawnTurnManagerIfNeeded()
-    {
-        
-        if (_turnManager != null)
-            return;
-
-        Debug.Log("[GM] Creating TurnManager AFTER Canvas exists");
-
-        var canvas = GameObject.Find("Canvas");
-        if (canvas == null)
-        {
-            Debug.LogWarning("[GM] Canvas not found yet, delaying TurnManager creation...");
-            StartCoroutine(DelaySpawnTurnManager());
-            return;
-        }
-
-        var go = Instantiate(turnManagerPrefab, canvas.transform);
-        _turnManager = go.GetComponent<TurnManager>();
-
-        Debug.Log("[GM] TurnManager successfully created under Canvas");
-        
-    }
-
-    private IEnumerator DelaySpawnTurnManager()
-    {
-        while (GameObject.Find("Canvas") == null)
-            yield return null;
-
-        SpawnTurnManagerIfNeeded();
-    }*/
-
 
     #region FusionMethods
 
@@ -443,18 +346,8 @@ public class GameManager : MonoBehaviour, INetworkRunnerCallbacks
             // Keep track of the player avatars for easy access
             _spawnedCharacters.Add(player, networkPlayerObject);
         }
-        /*
-        var curScene = PlayerPrefs.GetString("currentScene");
-
-        // 🔵 로비에서는 즉시 스폰
-        if (curScene == "LobbyScene")
-        {
-            SpawnPlayerInLobby(runner, player);
-            return;
-        }
-
-        // 🔴 GAMETEST에서는 보드 생성 완료까지 대기
-*/    }
+        
+    }
 
     public void OnPlayerLeft(NetworkRunner runner, PlayerRef player)
     {

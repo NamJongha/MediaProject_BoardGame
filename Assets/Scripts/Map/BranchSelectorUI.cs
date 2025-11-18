@@ -1,26 +1,17 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 
-/// <summary>
-/// Branch(갈림길) 선택 UI – 네트워크 완전 호환 버전
-/// 구조:
-/// 1) InputAuthority 플레이어에게만 UI 표시
-/// 2) UI 버튼 클릭 → RPC_ChooseBranch(index) 호출 (Host로 전송)
-/// 3) Host(StateAuthority)가 선택 확정
-/// 4) PlayerMover가 Host가 선택한 경로로 이동
-/// </summary>
 public class BranchSelectorUI : MonoBehaviour
 {
     public static BranchSelectorUI Instance;
 
     [Header("UI Elements")]
-    [SerializeField] private GameObject panel;              // 전체 패널
-    [SerializeField] private Button branchButtonPrefab;     // 버튼 프리팹
-    [SerializeField] private Transform buttonContainer;     // 버튼이 들어갈 영역
+    [SerializeField] private GameObject panel;
+    [SerializeField] private Button branchButtonPrefab;
 
-    private Player currentPlayer;                          // 현재 턴 플레이어
-    private List<BoardNode> currentBranches;               // 선택 가능한 분기 리스트
+    private Dictionary<Player, List<BoardNode>> playerBranches = new Dictionary<Player, List<BoardNode>>();
 
     private void Awake()
     {
@@ -28,60 +19,51 @@ public class BranchSelectorUI : MonoBehaviour
         panel.SetActive(false);
     }
 
-    /// <summary>
-    /// 현재 턴 플레이어에게만 표시되는 UI
-    /// </summary>
     public void Show(List<BoardNode> branches, Player player)
     {
-        // UI는 반드시 InputAuthority(본인 턴 플레이어)에서만 보인다.
         if (!player.Object.HasInputAuthority)
             return;
 
-        currentPlayer = player;
-        currentBranches = branches;
+        if (branches == null || branches.Count == 0)
+        {
+            Debug.LogError("[BranchSelectorUI] branches가 null이거나 비어 있음!");
+            return;
+        }
+
+        playerBranches[player] = branches;
 
         panel.SetActive(true);
 
         // 기존 버튼 제거
-        foreach (Transform btn in buttonContainer)
-            Destroy(btn.gameObject);
+        foreach (Transform child in panel.transform)
+            Destroy(child.gameObject);
 
-        // 버튼 생성
+        // 버튼 생성 (panel이 직접 ButtonContainer 역할 수행)
         for (int i = 0; i < branches.Count; i++)
         {
             int index = i;
-            Button b = Instantiate(branchButtonPrefab, buttonContainer);
 
-            // 버튼 텍스트 설정
-            Text t = b.GetComponentInChildren<Text>();
-            t.text = branches[i].name;
+            Button btn = Instantiate(branchButtonPrefab, panel.transform);
 
-            // 클릭 시 → Host에게 선택 전달
-            b.onClick.AddListener(() =>
+            TMP_Text btnText = btn.GetComponentInChildren<TMP_Text>();
+            btnText.text = (i == 0) ? "Main Path" : "Branch Path";
+
+            btn.onClick.AddListener(() =>
             {
-                OnBranchButtonClicked(index);
+                OnBranchButtonClicked(player, index);
             });
         }
     }
 
-    /// <summary>
-    /// 클라이언트(InputAuthority)에서 버튼 클릭 시 실행됨
-    /// </summary>
-    private void OnBranchButtonClicked(int index)
+    private void OnBranchButtonClicked(Player player, int index)
     {
-        if (currentPlayer == null)
+        if (player == null)
             return;
 
-        // Host에게 "이 갈림길(index) 선택함" RPC 요청
-        currentPlayer.RPC_ChooseBranch(index);
-
+        player.RPC_ChooseBranch(index);
         panel.SetActive(false);
     }
 
-    /// <summary>
-    /// 외부(PlayerMover)가 선택된 BoardNode 요청할 때 사용하는 함수
-    /// Host에서 RPC_ChooseBranch(index) 완료 후 MoveSteps가 이어짐
-    /// </summary>
     public BoardNode GetChosenNode(Player player)
     {
         if (!player.Object.HasStateAuthority)
@@ -90,17 +72,28 @@ public class BranchSelectorUI : MonoBehaviour
             return null;
         }
 
-        if (currentBranches == null || currentBranches.Count == 0)
+        if (!playerBranches.ContainsKey(player))
+        {
+            Debug.LogError("[BranchSelectorUI] 해당 플레이어에 대한 branch 목록이 없습니다!");
             return null;
+        }
+
+        List<BoardNode> branches = playerBranches[player];
+
+        if (branches == null || branches.Count == 0)
+        {
+            Debug.LogError("[BranchSelectorUI] branches 리스트가 비어 있습니다.");
+            return null;
+        }
 
         int index = player.chosenBranchIndex;
-        if (index < 0 || index >= currentBranches.Count)
+        if (index < 0 || index >= branches.Count)
         {
             Debug.LogError("[BranchSelectorUI] Branch 선택 인덱스가 범위를 벗어남!");
             return null;
         }
 
-        return currentBranches[index];
+        Debug.Log($"[BranchSelectorUI] Host에서 {player} → Branch {index} 선택 확정됨.");
+        return branches[index];
     }
 }
-

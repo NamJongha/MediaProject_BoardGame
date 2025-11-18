@@ -7,6 +7,6 @@ public class ItemGetEffect : SpecialTileEffectBase
     public override void ApplyEffect(Player target)
     {
         if (target == null || !target.Object.HasStateAuthority) return;
-        LogManager.Instance.Log($"[SpecialTileEffect] {target.playerName} 아이템 획득!");
+        LogManager.Instance.Log($"[SpecialTileEffect] {target.playerName} Get item!");
     }
 }   

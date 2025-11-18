@@ -108,6 +108,7 @@ MonoBehaviour:
   terrainType: 0
   nodeType: 2
   isBranchNode: 0
+  isSpawnNode: 0
   nextNodes: []
   debugColor: {r: 1, g: 1, b: 1, a: 1}
 --- !u!65 &8057739649853082027
@@ -142,7 +143,6 @@ GameObject:
   - component: {fileID: 4683484059448398531}
   - component: {fileID: 1564228936560144175}
   - component: {fileID: 8177023162492075982}
-  - component: {fileID: 2823855562872527619}
   m_Layer: 0
   m_Name: Collider
   m_TagString: Untagged
@@ -180,7 +180,7 @@ BoxCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
@@ -198,22 +198,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 43a3568676fc108449be0b795562bdef, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SpecialTile
-  effect: {fileID: 11400000, guid: 665131db4645b644ba19efa1103c1962, type: 2}
---- !u!114 &2823855562872527619
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6580579656704342010}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: -1552182283, guid: e725a070cec140c4caffb81624c8c787, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Fusion.Runtime.dll::Fusion.NetworkObject
-  SortKey: 0
-  ObjectInterest: 1
-  Flags: 262144
-  NestedObjects: []
-  NetworkedBehaviours: []
-  ForceRemoteRenderTimeframe: 0
+  effect: {fileID: 11400000, guid: b2f96a03fbdc52346b264b9668afae29, type: 2}

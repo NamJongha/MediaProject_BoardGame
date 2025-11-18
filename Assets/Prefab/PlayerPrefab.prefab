@@ -16,7 +16,7 @@ GameObject:
   - component: {fileID: -1812790642658024310}
   m_Layer: 0
   m_Name: PlayerPrefab
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -57,6 +57,7 @@ MonoBehaviour:
   NetworkedBehaviours:
   - {fileID: 3322929515959343473}
   - {fileID: -6818316763538574161}
+  - {fileID: -1812790642658024310}
   ForceRemoteRenderTimeframe: 0
 --- !u!143 &4952908683897876226
 CharacterController:
@@ -124,6 +125,7 @@ MonoBehaviour:
   _chosenBranchIndex: 0
   _branchSelected:
     _value: 0
+  _currentNodeId: 0
   nameObject: {fileID: 3867795253658474123}
   playerButtonPrefab: {fileID: 7496753795516818450, guid: f7e17a236a7194f4d8a6ec68303d7ab3, type: 3}
 --- !u!114 &-1812790642658024310

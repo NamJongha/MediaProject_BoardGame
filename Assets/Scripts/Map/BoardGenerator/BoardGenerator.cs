@@ -48,16 +48,12 @@ public class BoardGenerator : MonoBehaviour
     [Header("Terrain Regions")] public List<TerrainRegion> terrainRegions = new();
 
     private List<BoardNode> allNodes = new List<BoardNode>();
-    public BoardNode startNode;
     public List<BoardNode> spawnNodes = new List<BoardNode>();
     private BoardNode goalNode;
     
     public static BoardGenerator Instance { get; private set; }
     private void Start()
     {
-        //GenerateBoard();
-        //CollectSpawnNodes();
-        //CollectStartNode();
     }
     
     private void Awake()
@@ -76,17 +72,6 @@ public class BoardGenerator : MonoBehaviour
 
         Debug.Log($"[BoardGenerator] SpawnNodes collected = {spawnNodes.Count}");
 
-    }
-
-    private void CollectStartNode()
-    {
-        // 첫 번째 노드 = 0번 노드
-        startNode = (allNodes != null && allNodes.Count > 0) 
-            ? allNodes[0]
-            : null;
-
-        if (startNode == null)
-            Debug.LogError("StartNode가 없습니다!");
     }
     public void GenerateBoard(int seed)
     {
@@ -242,11 +227,21 @@ public class BoardGenerator : MonoBehaviour
     
     public BoardNode GetStartNode()
     {
-        if (allNodes == null || allNodes.Count == 0)
+        if (spawnNodes == null || spawnNodes.Count == 0)
+        {
+            Debug.LogError("Start nodes not set!");
             return null;
+        }
+
         return allNodes[0];
     }
     
-    
+    public BoardNode GetNodeById(int id)
+    {
+        if (id < 0 || id >= allNodes.Count)
+            return null;
+
+        return allNodes[id];
+    }
 
 }

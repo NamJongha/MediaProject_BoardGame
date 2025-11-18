@@ -15,6 +15,8 @@ public class Player : NetworkBehaviour
     [Networked] public int playerStamina { get; set; } = MaxStamina;
     [Networked] public int chosenBranchIndex { get; set; }
     [Networked] public NetworkBool branchSelected { get; set; }
+    
+    [Networked] public int currentNodeId { get; set; } = -1;
 
     [SerializeField] private GameObject nameObject; //text to show name above the player
     private TextMeshProUGUI nameText;

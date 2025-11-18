@@ -1,8 +1,9 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Fusion;
 
-public class PlayerMover : MonoBehaviour
+public class PlayerMover : NetworkBehaviour
 {
     [Header("이동 설정")]
     private float moveSpeed = 4f;
@@ -14,12 +15,15 @@ public class PlayerMover : MonoBehaviour
 
     [Header("브랜치 UI")]
     private BranchSelectorUI branchSelectorUI;   // 갈림길 선택 UI
+    
+    private NetworkCharacterController _cc;
 
     private void Start()
     {
         // 씬에서 BranchSelectorUI 자동 찾기
         if (branchSelectorUI == null)
             branchSelectorUI = FindFirstObjectByType<BranchSelectorUI>();
+        _cc = GetComponent<NetworkCharacterController>();
     }
     
     public IEnumerator MoveStepsAndFinishTurn(int steps, Player player, TurnManager turnManager)
@@ -32,36 +36,44 @@ public class PlayerMover : MonoBehaviour
     
     public IEnumerator MoveSteps(int steps, Player player)
     {
-        if (currentNode == null) //이 부분에서 진행 안됨
+        
+        if (currentNode == null)
         {
-            Debug.LogError("currentNode가 없습니다. 플레이어 스폰 상태 확인 필요.");
-            yield break;
+            if (player.currentNodeId >= 0)
+            {
+                currentNode = BoardGenerator.Instance.GetNodeById(player.currentNodeId);
+                if (currentNode == null)
+                {
+                    Debug.LogError($"[PlayerMover] NodeId {player.currentNodeId} 를 찾을 수 없습니다.");
+                    yield break;
+                }
+            }
+            else
+            {
+                // 아직 보드 위에 없으면 StartNode로 초기화
+                currentNode = BoardGenerator.Instance.GetStartNode();
+                if (currentNode == null)
+                {
+                    Debug.LogError("[PlayerMover] StartNode가 없습니다.");
+                    yield break;
+                }
+            }
+
+            // 위치도 보정
+            TeleportToNode(currentNode);
         }
 
         isMoving = true;
-        BoardNode finalNode = currentNode;
-        BoardNode startNode = BoardGenerator.Instance.GetStartNode();
-        if (finalNode != startNode)
-        {
-            // 첫 칸은 StartNode로 고정 이동
-            steps -= 1;
-            yield return StartCoroutine(MoveToNode(startNode, triggerEventOnArrival: false));
-            finalNode = startNode;
-
-            if (steps <= 0)
-            {
-                yield return StartCoroutine(MoveToNode(finalNode, triggerEventOnArrival: true));
-                currentNode = finalNode;
-                isMoving = false;
-                yield break;
-            }
-        }
+        BoardNode finalNode = GetCurrentNode();
         
         for (int i = 0; i < steps; i++)
         {
             // 다음 노드가 없으면 중단
             if (finalNode.nextNodes == null || finalNode.nextNodes.Count == 0)
+            {
+                Debug.Log($"[PlayerMover] No more nodes to move. Stopping at final node: {finalNode.id}");
                 break;
+            }
 
             // ---- 브랜치 발생 시 UI 선택 대기 ----
             if (finalNode.nextNodes.Count > 1)
@@ -78,13 +90,34 @@ public class PlayerMover : MonoBehaviour
         // 마지막 노드에서 이벤트 실행
         yield return StartCoroutine(MoveToNode(finalNode, triggerEventOnArrival: true));
 
+        if (finalNode.nextNodes == null || finalNode.nextNodes.Count == 0)
+        {
+            LogManager.Instance.Log($"[PlayerMover] Final node reached! Player={player.name}, Node ID={finalNode.id}");
+        }
+        
         SetCurrentNode(finalNode);
+        player.currentNodeId = finalNode.id;
+        
+        Debug.Log($"PlayerMover → player.currentNodeId updated to {finalNode.id}");
+        
         isMoving = false;
     }
 
 
     private IEnumerator ChoosePath(BoardNode node, Player player)
     {
+        if (branchSelectorUI == null)
+        {
+            Debug.LogError("[PlayerMover] branchSelectorUI is null! Make sure BranchSelectorUI exists in the scene.");
+            yield break;
+        }
+
+        if (node.nextNodes == null || node.nextNodes.Count == 0)
+        {
+            Debug.LogWarning("[PlayerMover] No branches to choose from. Skipping branch selection.");
+            yield break;
+        }
+
         // InputAuthority만 UI 띄운다
         branchSelectorUI.Show(node.nextNodes, player);
 
@@ -92,15 +125,19 @@ public class PlayerMover : MonoBehaviour
         while (!player.branchSelected)
             yield return null;
 
-        // 선택 완료 → Host에서 해당 브랜치 확정
         BoardNode chosen = branchSelectorUI.GetChosenNode(player);
 
-        node.nextNodes.Clear();
-        node.nextNodes.Add(chosen);
+        if (chosen == null)
+        {
+            Debug.LogError("[PlayerMover] chosen branch is null.");
+            yield break;
+        }
 
-        // 다음 선택을 위해 초기화
+        node.nextNodes.Clear();
+
         player.branchSelected = false;
     }
+
     
     private IEnumerator MoveToNode(BoardNode targetNode, bool triggerEventOnArrival)
     {
@@ -111,7 +148,7 @@ public class PlayerMover : MonoBehaviour
         while (t < 1f)
         {
             t += Time.deltaTime * moveSpeed;
-            transform.position = Vector3.Lerp(start, end, t);
+            TeleportPosition(Vector3.Lerp(start, end, t));
             yield return null;
         }
 
@@ -119,12 +156,19 @@ public class PlayerMover : MonoBehaviour
         if (triggerEventOnArrival)
         {
             SpecialTile tile = targetNode.GetComponent<SpecialTile>();
-            if (tile != null && tile.effect != null)
+            if (tile != null)
             {
-                // ScriptableObject 기반 SpecialTile 효과 실행
-                tile.effect.ApplyEffect(GetComponent<Player>());
+                if (tile.effect != null)
+                {
+                    tile.effect.ApplyEffect(GetComponent<Player>());
+                }
+                else
+                {
+                    Debug.Log($"[SpecialTile] Tile {tile.name} has NO effect, skipping event.");
+                }
             }
         }
+        Physics.SyncTransforms();
     }
 
     public BoardNode GetCurrentNode()
@@ -140,8 +184,23 @@ public class PlayerMover : MonoBehaviour
             return;
         }
 
-        Debug.Log($"[PlayerMover] 노드 변경: {currentNode} → {node}");
+        Debug.Log($"[PlayerMover] 노드 변경: {(currentNode != null ? currentNode.id : -1)} → {node.id}");
         currentNode = node;
+    }
+    
+    private void TeleportPosition(Vector3 position)
+    {
+        if (_cc)
+            _cc.Teleport(position);
+        else
+            transform.position = position;
+    }
+
+// Node 기준 위치 이동
+    private void TeleportToNode(BoardNode node)
+    {
+        Vector3 pos = node.transform.position + new Vector3(0, arriveHeightOffset, 0);
+        TeleportPosition(pos);
     }
 
 }

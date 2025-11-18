@@ -10,6 +10,6 @@ public class StaminaUpEffect : SpecialTileEffectBase
     {
         if (target == null || !target.Object.HasStateAuthority) return;
         target.ModifyStamina(amount);
-        LogManager.Instance.Log($"[SpecialTileEffect] {target.playerName} 스태미너 +{amount}");
+        LogManager.Instance.Log($"[SpecialTileEffect] {target.playerName} stamina +{amount}");
     }
 }

@@ -2,7 +2,7 @@ using Fusion;
 using UnityEngine;
 
 [RequireComponent(typeof(Collider))]
-public class SpecialTile : NetworkBehaviour
+public class SpecialTile : MonoBehaviour
 {
     public SpecialTileEffectBase effect;
     private bool triggered = false;
