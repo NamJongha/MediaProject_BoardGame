@@ -12,11 +12,12 @@ public class TurnManager : NetworkBehaviour
 
     private GameManager gameManager;
     
-    private Button rollDiceButton;
     private Button turnDecideButton;
     private Button turnStartButton;
+    private Button rollDiceButton;
     private Button useItemButton;
     private Button viewMapButton;
+    private Button closeMapButton;
     
     private WaitingForOrderState waitingForOrderState;
     private DecidingOrderState  decidingOrderState;
@@ -31,19 +32,6 @@ public class TurnManager : NetworkBehaviour
 
     private void Awake()
     {
-        //var buttons = new Button[2];
-        //buttons = FindObjectsByType<Button>(default);
-//
-        //foreach (var btn in buttons)
-        //    if (btn.name == "OrderDecideButton")
-        //    {
-        //        turnDecideButton = btn;
-        //    }
-        //    else if (btn.name == "TurnStartButton") 
-        //    {
-        //        turnStartButton = btn;
-        //    }
-
         waitingForOrderState = new WaitingForOrderState(this);
         decidingOrderState = new DecidingOrderState(this);
         turnStartState = new TurnStartState(this);
@@ -131,17 +119,24 @@ public class TurnManager : NetworkBehaviour
                         useItemButton.onClick.AddListener(OnClickUseItem);
                         Debug.Log("[TM] UseItemButton connected");
                         break;
-
+                    
                     case "ViewMapButton":
                         viewMapButton = btn;
                         viewMapButton.onClick.RemoveAllListeners();
                         viewMapButton.onClick.AddListener(OnClickViewMap);
-                        Debug.Log("[TM] ViewMapButton connected");
+                        Debug.Log("[TM] UseItemButton connected");
+                        break;
+                    
+                    case "CloseMapButton":
+                        closeMapButton = btn;
+                        closeMapButton.onClick.RemoveAllListeners();
+                        closeMapButton.onClick.AddListener(OnClickCloseMap);
+                        Debug.Log("[TM] UseItemButton connected");
                         break;
                 }
             }
 
-            if (rollDiceButton != null && useItemButton != null && viewMapButton != null)
+            if (rollDiceButton != null && useItemButton != null)
             {
                 Debug.Log("[TM] Runtime UI buttons connected!");
                 yield break;
@@ -152,7 +147,6 @@ public class TurnManager : NetworkBehaviour
 
         Debug.LogWarning("[TM] Timeout binding runtime buttons!");
     }
-
 
     private IEnumerator DelayedInitState()
     {
@@ -212,7 +206,10 @@ public class TurnManager : NetworkBehaviour
         LogManager.Instance.Log("Roll Dice Button Click detected");
 
         var current = GetCurrentTurnPlayer();
-        if (current != null) current.RequestDiceRoll();
+        if (current != null)
+        {
+            current.RequestRollDice();
+        }
     }
 
     private void OnClickUseItem()
@@ -227,11 +224,23 @@ public class TurnManager : NetworkBehaviour
 
     private void OnClickViewMap()
     {
-        LogManager.Instance.Log("View Map Button Click detected");
+        LogManager.Instance.Log("Use Item Button Click detected");
 
         var current = GetCurrentTurnPlayer();
         if (current != null)
         {
+            current.RequestControlMap();
+        }
+    }
+    
+    private void OnClickCloseMap()
+    {
+        LogManager.Instance.Log("Use Item Button Click detected");
+
+        var current = GetCurrentTurnPlayer();
+        if (current != null)
+        {
+            current.RequestControlMap();
         }
     }
 
