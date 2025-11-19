@@ -186,7 +186,8 @@ public class GameManager : MonoBehaviour, INetworkRunnerCallbacks
         foreach (var player in runner.ActivePlayers)
         {
             var index = Mathf.Clamp(player.PlayerId - 1, 0, spawnPoints.Length - 1);
-            var pos = spawnPoints[player.PlayerId - 1].transform.position;
+            //y offset을 주어서 날아가는 것 방지
+            var pos = spawnPoints[player.PlayerId - 1].transform.position + new Vector3(0, 2.5f, 0);
             
             // 새로 스폰
             var newObj = _runner.Spawn(_playerPrefab, pos, Quaternion.identity, player);

@@ -28,12 +28,10 @@ public class Player : NetworkBehaviour
     private ChangeDetector changeDetector;
     private TurnManager turnManager;
 
-    [SerializeField] private Button playerButtonPrefab;
-    private Button endTurnButtonInstance;
-    private Button diceRollButtonInstance;
-    private Button useItemButtonInstance;
-    private Button viewMapButtonInstance;
+    private PlayerUIManager playerUIManager;
 
+    private bool isMapMode = false;
+    
     private void Awake()
     
     {
@@ -62,53 +60,8 @@ public class Player : NetworkBehaviour
                 lobby.SetLocalPlayer(this);
                 lobby.UpdateButtonState();
             }
-
             
-            #region instantiate buttons
-
-            endTurnButtonInstance = Instantiate(playerButtonPrefab);
-
-            //instantiate player's menu button and rename it
-            diceRollButtonInstance = Instantiate(playerButtonPrefab);
-            diceRollButtonInstance.name = "DiceRollButton";
-            useItemButtonInstance = Instantiate(playerButtonPrefab);
-            useItemButtonInstance.name = "UseItemButton";
-            viewMapButtonInstance = Instantiate(playerButtonPrefab);
-            viewMapButtonInstance.name = "ViewMapButton";
-
-            //Set button's parent to canvas
-            endTurnButtonInstance.transform.SetParent(GameObject.Find("Canvas").transform);
-            diceRollButtonInstance.transform.SetParent(GameObject.Find("Canvas").transform);
-            useItemButtonInstance.transform.SetParent(GameObject.Find("Canvas").transform);
-            viewMapButtonInstance.transform.SetParent(GameObject.Find("Canvas").transform);
-
-            //Set button's position
-            RectTransform rt;
-            rt = endTurnButtonInstance.GetComponent<RectTransform>();
-            rt.anchoredPosition = new Vector2(365, -250);
-            rt = diceRollButtonInstance.GetComponent<RectTransform>();
-            rt.anchoredPosition = new Vector2(365, 170);
-            rt = useItemButtonInstance.GetComponent<RectTransform>();
-            rt.anchoredPosition = new Vector2(365, 120);
-            rt = viewMapButtonInstance.GetComponent<RectTransform>();
-            rt.anchoredPosition = new Vector2(365, 70);
-
-            //Set button's text
-            endTurnButtonInstance.GetComponentInChildren<TMP_Text>().text = "End Turn";
-            diceRollButtonInstance.GetComponentInChildren<TMP_Text>().text = "Roll Dice";
-            useItemButtonInstance.GetComponentInChildren<TMP_Text>().text = "Use Item";
-            viewMapButtonInstance.GetComponentInChildren<TMP_Text>().text = "View Map";
-
-            //Add events on button
-            endTurnButtonInstance.onClick.AddListener(OnEndTurnButtonClicked);
-
-            //Initialize state
-            endTurnButtonInstance.gameObject.SetActive(false);
-            diceRollButtonInstance.gameObject.SetActive(false);
-            useItemButtonInstance.gameObject.SetActive(false);
-            viewMapButtonInstance.gameObject.SetActive(false);
-
-            #endregion
+            playerUIManager = gameObject.GetComponent<PlayerUIManager>();
         }
     }
 
@@ -128,14 +81,10 @@ public class Player : NetworkBehaviour
                 if (change == nameof(isPlayerTurn))
                 {
                     Debug.Log("isPlayerTurnChanged");
-                    Debug.Assert(playerButtonPrefab != null);
                     if (Object.HasInputAuthority)
                     {
                         //show button only when the player turn comes
-                        endTurnButtonInstance.gameObject.SetActive(isPlayerTurn);
-                        diceRollButtonInstance.gameObject.SetActive(isPlayerTurn);
-                        useItemButtonInstance.gameObject.SetActive(isPlayerTurn);
-                        viewMapButtonInstance.gameObject.SetActive(isPlayerTurn);
+                        playerUIManager.SetTurnButtonsVisible(isPlayerTurn);
                     }
                 }
 
@@ -184,28 +133,10 @@ public class Player : NetworkBehaviour
 
     #region Button Events
 
-    private void OnEndTurnButtonClicked()
+    public void RequestRollDice()
     {
-        if (Object.HasInputAuthority)
-        {
-            if (isPlayerTurn)
-            {
-                RPC_RequestEndTurn();
-            }
-        }
+        OnDiceRollButtonClicked();
     }
-
-    [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
-    private void RPC_RequestEndTurn()
-    {
-        if (turnManager == null)
-        {
-            turnManager = FindFirstObjectByType<TurnManager>();
-        }
-
-        turnManager.OnPlayerEndTurn(Object.InputAuthority); //this is for managing turn state in turnManager
-    }
-
     private void OnDiceRollButtonClicked()
     {
         if (Object.HasInputAuthority)
@@ -245,11 +176,6 @@ public class Player : NetworkBehaviour
         // Update Stamina Text and UI
         LogManager.Instance.Log($"{playerName} stamina is now {playerStamina}");
     }
-
-    public void RequestDiceRoll()
-    {
-        OnDiceRollButtonClicked();
-    }
     
     private void OnUseItemButtonClicked()
     {
@@ -268,7 +194,12 @@ public class Player : NetworkBehaviour
         Debug.Assert(turnManager != null);
     }
 
-    private void OnViewMapButtonClicked()
+    public void RequestControlMap()
+    {
+        OnMapControlButtonClicked();
+    }
+    
+    private void OnMapControlButtonClicked()
     {
         if (Object.HasInputAuthority)
         {
@@ -286,8 +217,41 @@ public class Player : NetworkBehaviour
         {
             turnManager = FindFirstObjectByType<TurnManager>();
         }
+        
+        bool enteringMapMode = !isMapMode;
+        
+        isMapMode = enteringMapMode;
 
-        //write view map script here
+        // RPC로 전체 클라이언트에게 반영
+        ApplyViewMapModeLocal(enteringMapMode);
+
+    }
+    
+    private void ApplyViewMapModeLocal(bool entering)
+    {
+        if (entering)
+        {
+            // 맵뷰 진입
+            CameraManager.Instance.EnterViewMap();
+
+            if (Object.HasInputAuthority)
+            {
+                playerUIManager.SetTurnButtonsVisible(false);
+                playerUIManager.SetMapCloseButtonVisible(true);
+            }
+        }
+        else
+        {
+            // 맵뷰 종료
+            CameraManager.Instance.ExitViewMap();
+            CameraManager.Instance.SetPlayerCamera(this.Object);
+
+            if (Object.HasInputAuthority)
+            {
+                playerUIManager.SetTurnButtonsVisible(true);
+                playerUIManager.SetMapCloseButtonVisible(false);
+            }
+        }
     }
 
     #endregion

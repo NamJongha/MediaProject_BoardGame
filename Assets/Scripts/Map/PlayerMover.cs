@@ -134,6 +134,8 @@ public class PlayerMover : NetworkBehaviour
         }
 
         node.nextNodes.Clear();
+        
+        node.nextNodes.Add(chosen);
 
         player.branchSelected = false;
     }

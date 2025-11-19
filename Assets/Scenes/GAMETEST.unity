@@ -3809,9 +3809,16 @@ MonoBehaviour:
   mainCamera: {fileID: 235932365}
   cameraOffset: {x: 0, y: 15, z: -15}
   cameraRotation: {x: 45, y: 0, z: 0}
-  cameraSpeedOffset: 2
+  cameraSpeedOffset: 5
   _isWatchingPlayer: 0
   _currentPlayer: {fileID: 0}
+  viewMapStartPos: {x: 0, y: 120, z: 0}
+  viewMapStartRot: {x: 90, y: 0, z: 0}
+  clampX: {x: 10, y: 1260}
+  clampZ: {x: -60, y: 80}
+  clampY: {x: 80, y: 180}
+  mapMoveSpeed: 150
+  mapZoomSpeed: 300
 --- !u!4 &255665583
 Transform:
   m_ObjectHideFlags: 0
