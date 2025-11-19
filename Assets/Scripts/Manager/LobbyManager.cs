@@ -133,6 +133,8 @@ public class LobbyManager : MonoBehaviour
                 Debug.Log("player " + kvp.Key + " is despawned");
             }
         }
-        runner.LoadScene("GameScene");
+        runner.LoadScene("GAMETEST");
     }
+    
+    
 }

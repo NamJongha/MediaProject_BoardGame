@@ -12,9 +12,16 @@ public class CameraManager : NetworkBehaviour
     [SerializeField] private Vector3 cameraRotation;
     [SerializeField] private float cameraSpeedOffset;
 
+    private bool isSpawned = false;
+    
     [Networked] public bool isWatchingPlayer { get; set; } = false;
     [Networked] public NetworkObject currentPlayer { get; set; }
 
+    public override void Spawned()
+    {
+        isSpawned = true;
+    }
+    
     private void Awake()
     {
         Instance = this;
@@ -22,6 +29,8 @@ public class CameraManager : NetworkBehaviour
 
     private void FixedUpdate()
     {
+        if (!isSpawned) return;
+        
         if (isWatchingPlayer)
         {
             Vector3 targetPosition = (currentPlayer.transform.position + cameraOffset);
