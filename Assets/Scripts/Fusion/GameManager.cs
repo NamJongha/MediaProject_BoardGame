@@ -6,6 +6,7 @@ using Fusion;
 using Fusion.Sockets;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using Object = System.Object;
 using Random = UnityEngine.Random;
 
 public class GameManager : MonoBehaviour, INetworkRunnerCallbacks
@@ -15,10 +16,8 @@ public class GameManager : MonoBehaviour, INetworkRunnerCallbacks
     [SerializeField] private TurnManager turnManagerPrefab;
 
     [SerializeField] private GameObject[] spawnPoints = new GameObject[4];
-
-    private readonly Dictionary<PlayerRef, NetworkObject>
-        _spawnedCharacters =
-            new(); //players in room
+    
+    private readonly Dictionary<PlayerRef, NetworkObject> _spawnedCharacters = new(); //players in room(local dictionary)
 
     private NetworkRunner _runner;
     private TurnManager _turnManager;
@@ -86,8 +85,7 @@ public class GameManager : MonoBehaviour, INetworkRunnerCallbacks
         {
             PlayerPrefs.SetString("currentScene", "LobbyScene");
             PlayerPrefs.Save();
-            spawnPoints = GameObject.FindGameObjectsWithTag("SpawnPoint").OrderBy(spawnPoint => spawnPoint.name)
-                .ToArray();
+            spawnPoints = GameObject.FindGameObjectsWithTag("SpawnPoint").OrderBy(spawnPoint => spawnPoint.name).ToArray();
             StartCoroutine(StartAfterLoad());
         }
         else if (scene.name == "GAMETEST")
@@ -95,8 +93,7 @@ public class GameManager : MonoBehaviour, INetworkRunnerCallbacks
             PlayerPrefs.SetString("currentScene", "GAMETEST");
             PlayerPrefs.Save();
             spawnPoints = new GameObject[4];
-            spawnPoints = GameObject.FindGameObjectsWithTag("SpawnPoint").OrderBy(spawnPoint => spawnPoint.name)
-                .ToArray(); //spawn players
+            spawnPoints = GameObject.FindGameObjectsWithTag("SpawnPoint").OrderBy(spawnPoint => spawnPoint.name).ToArray(); //spawn players
             StartCoroutine(StartAfterLoad());
         }
     }
@@ -151,7 +148,18 @@ public class GameManager : MonoBehaviour, INetworkRunnerCallbacks
 
     public Dictionary<PlayerRef, NetworkObject> GetPlayersList()
     {
-        return _spawnedCharacters;
+        Dictionary<PlayerRef, NetworkObject> dic = new Dictionary<PlayerRef, NetworkObject>();
+
+        foreach (PlayerRef playerRef in _runner.ActivePlayers)
+        {
+            NetworkObject playerObject = _runner.GetPlayerObject(playerRef);
+            if (playerObject)
+            {
+                dic[playerRef] = playerObject;
+            }
+        }
+
+        return dic;
     }
 
     private IEnumerator RespawnAllPlayersAfterBoardReady(NetworkRunner runner)
@@ -186,7 +194,8 @@ public class GameManager : MonoBehaviour, INetworkRunnerCallbacks
         foreach (var player in runner.ActivePlayers)
         {
             var index = Mathf.Clamp(player.PlayerId - 1, 0, spawnPoints.Length - 1);
-            var pos = spawnPoints[player.PlayerId - 1].transform.position;
+            //y offset을 주어서 날아가는 것 방지
+            var pos = spawnPoints[player.PlayerId - 1].transform.position + new Vector3(0, 2.5f, 0);
             
             // 새로 스폰
             var newObj = _runner.Spawn(_playerPrefab, pos, Quaternion.identity, player);
@@ -346,7 +355,6 @@ public class GameManager : MonoBehaviour, INetworkRunnerCallbacks
             // Keep track of the player avatars for easy access
             _spawnedCharacters.Add(player, networkPlayerObject);
         }
-        
     }
 
     public void OnPlayerLeft(NetworkRunner runner, PlayerRef player)

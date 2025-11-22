@@ -11,12 +11,12 @@
         
         public void OnStateEnter()
         {
-            LogManager.Instance.Log("Entering TurnActionState");
+            //LogManager.Instance.Log("Entering TurnActionState");
         }
 
         public void OnStateExit()
         {
-            LogManager.Instance.Log("Exiting TurnActionState");
+            //LogManager.Instance.Log("Exiting TurnActionState");
         }
     }
 }

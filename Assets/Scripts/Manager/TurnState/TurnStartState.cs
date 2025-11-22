@@ -11,7 +11,7 @@
         
         public void OnStateEnter()
         {
-            LogManager.Instance.Log("Entering TurnStartState");
+            //LogManager.Instance.Log("Entering TurnStartState");
             turnManager.ShowTurnDecideButton(false);
             turnManager.ShowTurnStartButton(false);
             /*
@@ -28,7 +28,7 @@
 
         public void OnStateExit()
         {
-            LogManager.Instance.Log("Exiting TurnStartState");
+            //LogManager.Instance.Log("Exiting TurnStartState");
         }
     }
 }

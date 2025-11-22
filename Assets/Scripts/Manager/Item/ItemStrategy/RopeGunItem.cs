@@ -9,11 +9,12 @@ namespace Manager.ItemStrategy
         //image should be in Resoucres/Image/Item folder, and should be sprite type
         private string imagePath = "Image/Item/RopeGunItem";
         private Sprite itemSprite;
+        private string itemName = "RopeGunItem";
 
         public RopeGunItem()
         {
-            itemSprite = Resources.Load<Sprite>(imagePath);
-            Debug.Assert(itemSprite != null);
+            //itemSprite = Resources.Load<Sprite>(imagePath);
+            //Debug.Assert(itemSprite != null);
         }
         
         public void UseItem(Player target)
@@ -33,6 +34,11 @@ namespace Manager.ItemStrategy
         public Sprite GetItemSprite()
         {
             return itemSprite;
+        }
+
+        public string GetItemName()
+        {
+            return itemName;
         }
     }
 }

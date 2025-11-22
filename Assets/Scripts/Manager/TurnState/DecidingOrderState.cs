@@ -10,14 +10,14 @@
         }
         public void OnStateEnter()
         {
-            LogManager.Instance.Log("Entering DecidingOrderState");
+            //LogManager.Instance.Log("Entering DecidingOrderState");
             turnManager.ShowTurnDecideButton(false);
             turnManager.ShowTurnStartButton(true);
         }
 
         public void OnStateExit()
         {
-            LogManager.Instance.Log("Exiting DecidingOrderState");
+            //LogManager.Instance.Log("Exiting DecidingOrderState");
             turnManager.ShowTurnStartButton(false);
         }
     }
