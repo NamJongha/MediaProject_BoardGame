@@ -13,23 +13,23 @@ C:\Program Files\Unity\Hub\Editor\6000.2.1f1\Editor\Unity.exe
 -name
 AssetImportWorker0
 -projectPath
-D:/Unity/3D_BoardGame_GitMain
+C:/Users/user/Documents/Unity/BoardGame_Git_Test
 -logFile
 Logs/AssetImportWorker0.log
 -srvPort
 1372
 -licensingIpc
-LicenseClient-PC
+LicenseClient-user
 -job-worker-count
-2
+7
 -background-job-worker-count
 8
 -gc-helper-count
 1
 -name
 AssetImport
-Successfully changed project path to: D:/Unity/3D_BoardGame_GitMain
-D:/Unity/3D_BoardGame_GitMain
+Successfully changed project path to: C:/Users/user/Documents/Unity/BoardGame_Git_Test
+C:/Users/user/Documents/Unity/BoardGame_Git_Test
 [UnityMemory] Configuration Parameters - Can be set up in boot.config
     "memorysetup-allocator-temp-initial-block-size-main=262144"
     "memorysetup-allocator-temp-initial-block-size-worker=262144"
@@ -97,16 +97,16 @@ Refreshing native plugins compatible for Editor in 10.85 ms, found 4 plugins.
 Preloading 0 native plugins for Editor in 0.00 ms.
 Initialize engine version: 6000.2.1f1 (55300504c302)
 [Subsystems] Discovering subsystems at path C:/Program Files/Unity/Hub/Editor/6000.2.1f1/Editor/Data/Resources/UnitySubsystems
-[Subsystems] Discovering subsystems at path D:/Unity/3D_BoardGame_GitMain/Assets
+[Subsystems] Discovering subsystems at path C:/Users/user/Documents/Unity/BoardGame_Git_Test/Assets
 GfxDevice: creating device client; kGfxThreadingModeNonThreaded
 d3d12: failed to query info queue interface (0x80004002).
 Direct3D:
     Version:         Direct3D 12 [level 12.1]
-    Renderer:        NVIDIA GeForce GTX 1050 Ti (ID=0x1c82)
-    Vendor:          NVIDIA
-    VRAM:            4004 MB
-    App VRAM Budget: 3403 MB
-    Driver:          32.0.15.8157
+    Renderer:        AMD Radeon RX 7700 XT (ID=0x747e)
+    Vendor:          ATI
+    VRAM:            12272 MB
+    App VRAM Budget: 11309 MB
+    Driver:          32.0.21025.10016
 Initialize mono
 Mono path[0] = 'C:/Program Files/Unity/Hub/Editor/6000.2.1f1/Editor/Data/Managed'
 Mono path[1] = 'C:/Program Files/Unity/Hub/Editor/6000.2.1f1/Editor/Data/MonoBleedingEdge/lib/mono/unityjit-win32'
@@ -3508,7 +3508,7 @@ Mono: successfully reloaded assembly
 Domain Reload Profiling: 2430ms
 	BeginReloadAssembly (344ms)
 		ExecutionOrderSort (0ms)
-		DisableScriptedObjects (8ms)
+		DisableScriptedObjects (3ms)
 		BackupInstance (0ms)
 		ReleaseScriptingObjects (0ms)
 		CreateAndSetChildDomain (64ms)

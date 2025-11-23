@@ -6,30 +6,30 @@ BatchMode: 1, IsHumanControllingUs: 0, StartBugReporterOnCrash: 0, Is64bit: 1
 Date: 2025-10-25T08:41:32Z
 
 COMMAND LINE ARGUMENTS:
-D:\Unity\6000.2.1f1\Editor\Unity.exe
+C:\Program Files\Unity\Hub\Editor\6000.2.1f1\Editor\Unity.exe
 -adb2
 -batchMode
 -noUpm
 -name
 AssetImportWorker1
 -projectPath
-D:/Unity/3D_BoardGame
+C:/Users/user/Documents/Unity/BoardGame_Git_Test
 -logFile
 Logs/AssetImportWorker1.log
 -srvPort
 52910
 -licensingIpc
-LicenseClient-plaza
+LicenseClient-user
 -job-worker-count
-5
+7
 -background-job-worker-count
 8
 -gc-helper-count
 1
 -name
 AssetImport
-Successfully changed project path to: D:/Unity/3D_BoardGame
-D:/Unity/3D_BoardGame
+Successfully changed project path to: C:/Users/user/Documents/Unity/BoardGame_Git_Test
+C:/Users/user/Documents/Unity/BoardGame_Git_Test
 [UnityMemory] Configuration Parameters - Can be set up in boot.config
     "memorysetup-allocator-temp-initial-block-size-main=262144"
     "memorysetup-allocator-temp-initial-block-size-worker=262144"
@@ -75,7 +75,7 @@ JobSystem: Creating JobQueue using job-worker-count value 5
 Input System module state changed to: Initialized.
 [Physics::Module] Initialized fallback backend.
 [Physics::Module] Id: 0xdecafbad
-[Licensing::Client] Code 10 while verifying Licensing Client signature (process Id: 19352, path: "C:/Program Files/Unity Hub/UnityLicensingClient_V1/Unity.Licensing.Client.exe")
+[Licensing::Client] Code 10 while verifying Licensing Client signature (process Id: 4104, path: "C:/Program Files/Unity Hub/UnityLicensingClient_V1/Unity.Licensing.Client.exe")
 [Licensing::Module] LicensingClient has failed validation; ignoring
 [Licensing::Client] Handshaking with LicensingClient:
   Version:                 1.17.3+a4e98f1
@@ -96,17 +96,17 @@ Library Redirect Path: Library/
 Refreshing native plugins compatible for Editor in 191.39 ms, found 4 plugins.
 Preloading 0 native plugins for Editor in 0.00 ms.
 Initialize engine version: 6000.2.1f1 (55300504c302)
-[Subsystems] Discovering subsystems at path D:/Unity/6000.2.1f1/Editor/Data/Resources/UnitySubsystems
-[Subsystems] Discovering subsystems at path D:/Unity/3D_BoardGame/Assets
+[Subsystems] Discovering subsystems at path C:/Program Files/Unity/Hub/Editor/6000.2.1f1/Editor/Data/Resources/UnitySubsystems
+[Subsystems] Discovering subsystems at path C:/Users/user/Documents/Unity/BoardGame_Git_Test/Assets
 GfxDevice: creating device client; kGfxThreadingModeNonThreaded
 d3d12: failed to query info queue interface (0x80004002).
 Direct3D:
     Version:         Direct3D 12 [level 12.1]
-    Renderer:        NVIDIA GeForce RTX 2070 with Max-Q Design (ID=0x1f10)
-    Vendor:          NVIDIA
-    VRAM:            8006 MB
-    App VRAM Budget: 7238 MB
-    Driver:          32.0.15.8157
+    Renderer:        AMD Radeon RX 7700 XT (ID=0x747e)
+    Vendor:          ATI
+    VRAM:            12272 MB
+    App VRAM Budget: 11309 MB
+    Driver:          32.0.21025.10016
 Initialize mono
 Mono path[0] = 'D:/Unity/6000.2.1f1/Editor/Data/Managed'
 Mono path[1] = 'D:/Unity/6000.2.1f1/Editor/Data/MonoBleedingEdge/lib/mono/unityjit-win32'
@@ -2143,7 +2143,7 @@ Mono: successfully reloaded assembly
 Domain Reload Profiling: 2170ms
 	BeginReloadAssembly (272ms)
 		ExecutionOrderSort (0ms)
-		DisableScriptedObjects (11ms)
+		DisableScriptedObjects (5ms)
 		BackupInstance (0ms)
 		ReleaseScriptingObjects (0ms)
 		CreateAndSetChildDomain (62ms)
@@ -2169,7 +2169,7 @@ Domain Reload Profiling: 2170ms
 			ProcessInitializeOnLoadAttributes (654ms)
 			ProcessInitializeOnLoadMethodAttributes (89ms)
 			AfterProcessingInitializeOnLoad (3ms)
-			EditorAssembliesLoaded (1ms)
+			EditorAssembliesLoaded (0ms)
 		ExecutionOrderSort2 (0ms)
 		AwakeInstancesAfterBackupRestoration (37ms)
 Refreshing native plugins compatible for Editor in 4.41 ms, found 4 plugins.

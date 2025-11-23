@@ -157,6 +157,94 @@ public class TurnManager : NetworkBehaviour
 
         Debug.LogWarning("[TM] Timeout binding runtime buttons!");
     }
+    private IEnumerator WaitAndBindInitialButtons()
+    {
+        yield return new WaitForSeconds(0.5f);
+
+        for (int i = 0; i < 50; i++)
+        {
+            var buttons = FindObjectsByType<Button>(FindObjectsInactive.Include, FindObjectsSortMode.None);
+
+            foreach (var btn in buttons)
+            {
+                if (btn.name == "OrderDecideButton") //its name was wrong: turnDecideButton -> OrderDecideButton
+                {
+                    turnDecideButton = btn;
+                    turnDecideButton.onClick.RemoveAllListeners();
+                    turnDecideButton.onClick.AddListener(OnDecideButtonClicked);
+                    Debug.Log("[TM] TurnDecideButton connected");
+                }
+
+                if (btn.name == "TurnStartButton")
+                {
+                    turnStartButton = btn;
+                    turnStartButton.onClick.RemoveAllListeners();
+                    turnStartButton.onClick.AddListener(OnTurnStartButtonClicked);
+                    Debug.Log("[TM] TurnStartButton connected");
+                }
+            }
+
+            // 필수 버튼 둘 다 연결되었으면 종료
+            if (turnDecideButton != null && turnStartButton != null)
+            {
+                Debug.Log("[TM] Essential UI buttons connected");
+                yield break;
+            }
+
+            yield return new WaitForSeconds(0.1f);
+        }
+
+        Debug.LogWarning("[TM] Timeout binding essential buttons!");
+    }
+
+    private IEnumerator WaitAndBindRuntimeButtons()
+    {
+        Debug.Log("[TM] WaitAndBindRuntimeButtons START");
+
+        // UIManager가 버튼들을 생성할 시간을 기다린다
+        for (int i = 0; i < 50; i++)
+        {
+            var buttons = FindObjectsByType<Button>(FindObjectsInactive.Include, FindObjectsSortMode.None);
+
+            foreach (var btn in buttons)
+            {
+                switch (btn.name)
+                {
+                    case "DiceRollButton":
+                        rollDiceButton = btn;
+                        rollDiceButton.onClick.RemoveAllListeners();
+                        rollDiceButton.onClick.AddListener(OnClickRollDice);
+                        Debug.Log("[TM] DiceRollButton connected");
+                        break;
+
+                    case "UseItemButton":
+                        useItemButton = btn;
+                        useItemButton.onClick.RemoveAllListeners();
+                        useItemButton.onClick.AddListener(OnClickUseItem);
+                        Debug.Log("[TM] UseItemButton connected");
+                        break;
+
+                    case "ViewMapButton":
+                        viewMapButton = btn;
+                        viewMapButton.onClick.RemoveAllListeners();
+                        viewMapButton.onClick.AddListener(OnClickViewMap);
+                        Debug.Log("[TM] ViewMapButton connected");
+                        break;
+                }
+            }
+
+            if (rollDiceButton != null && useItemButton != null && viewMapButton != null)
+            {
+                Debug.Log("[TM] Runtime UI buttons connected!");
+                yield break;
+            }
+
+            yield return new WaitForSeconds(0.1f);
+        }
+
+        Debug.LogWarning("[TM] Timeout binding runtime buttons!");
+    }
+
 
     private IEnumerator DelayedInitState()
     {
