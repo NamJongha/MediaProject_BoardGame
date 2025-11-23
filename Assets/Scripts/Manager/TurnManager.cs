@@ -8,6 +8,8 @@ using UnityEngine.UI;
 
 public class TurnManager : NetworkBehaviour
 {
+    public static TurnManager Instance { get; private set; }
+    
     private ITurnState curTurnState;
 
     private GameManager gameManager;
@@ -24,6 +26,7 @@ public class TurnManager : NetworkBehaviour
     private TurnStartState turnStartState;
     private TurnActionState  turnActionState;
     private TurnEndState  turnEndState;
+    private TurnGameOverState turnGameOverState;
 
     [Networked] [Capacity(4)] public NetworkArray<PlayerRef> PlayerOrder => default;
     [Networked] public TurnState curState { get; set; }
@@ -37,6 +40,7 @@ public class TurnManager : NetworkBehaviour
         turnStartState = new TurnStartState(this);
         turnActionState = new TurnActionState(this);
         turnEndState = new TurnEndState(this);
+        turnGameOverState   = new TurnGameOverState(this);
     }
 
     public override void Spawned()
@@ -45,6 +49,11 @@ public class TurnManager : NetworkBehaviour
 
         Debug.Log("TurnManager: Spawned()");
 
+        if (GameManager.Instance != null)
+        {
+            GameManager.Instance.RegisterTurnManager(this);
+        }
+        
         curTurnState = waitingForOrderState;
 
         gameManager = FindFirstObjectByType<GameManager>();
@@ -53,6 +62,7 @@ public class TurnManager : NetworkBehaviour
 
         ResetOrder();
     }
+    
     private IEnumerator WaitAndBindInitialButtons()
     {
         yield return new WaitForSeconds(0.5f);
@@ -116,7 +126,7 @@ public class TurnManager : NetworkBehaviour
                     case "UseItemButton":
                         useItemButton = btn;
                         useItemButton.onClick.RemoveAllListeners();
-                        useItemButton.onClick.AddListener(OnClickUseItem);
+                        useItemButton.onClick.AddListener(OnClickOpenItemUI);
                         Debug.Log("[TM] UseItemButton connected");
                         break;
                     
@@ -124,14 +134,14 @@ public class TurnManager : NetworkBehaviour
                         viewMapButton = btn;
                         viewMapButton.onClick.RemoveAllListeners();
                         viewMapButton.onClick.AddListener(OnClickViewMap);
-                        Debug.Log("[TM] UseItemButton connected");
+                        Debug.Log("[TM] ViewMapButton connected");
                         break;
                     
                     case "CloseMapButton":
                         closeMapButton = btn;
                         closeMapButton.onClick.RemoveAllListeners();
                         closeMapButton.onClick.AddListener(OnClickCloseMap);
-                        Debug.Log("[TM] UseItemButton connected");
+                        Debug.Log("[TM] CloseMapButton connected");
                         break;
                 }
             }
@@ -212,13 +222,17 @@ public class TurnManager : NetworkBehaviour
         }
     }
 
-    private void OnClickUseItem()
+    private void OnClickOpenItemUI()
     {
         LogManager.Instance.Log("Use Item Button Click detected");
 
         var current = GetCurrentTurnPlayer();
         if (current != null)
         {
+            if (current != null)
+            {
+                current.RequestOpenItemUI();
+            }
         }
     }
 
@@ -358,6 +372,13 @@ public class TurnManager : NetworkBehaviour
         curTurnState = newState;
         curTurnState.OnStateEnter();
     }
+    public void EnterGameOverState()
+    {
+        ChangeState(turnGameOverState);
+        
+        // 네트워크 동기화 필요 시
+        curState = TurnState.GameOver;
+    }
 }
 
 #region enum for turn state
@@ -369,7 +390,8 @@ public enum TurnState //Finite State Machine maybe can use for network synchroni
     TurnStart,
     TurnAction,
     TurnEnd,
-    GameOver
+    GameOver,
+    TurnGameOver
 }
 
 #endregion

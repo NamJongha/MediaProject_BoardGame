@@ -25,6 +25,9 @@ public class GameManager : MonoBehaviour, INetworkRunnerCallbacks
 
     private bool boardReady;
     private int boardSeed = -1;
+    
+    [SerializeField] private GameObject gameOverPanelPrefab;
+    private GameOverPanel gameOverPanelInstance;
     public static GameManager Instance { get; private set; }
 
     public NetworkPrefabRef PlayerPrefab => _playerPrefab;
@@ -69,7 +72,7 @@ public class GameManager : MonoBehaviour, INetworkRunnerCallbacks
             // 2) 모든 플레이어 리스폰 코루틴 시작
             StartCoroutine(RespawnAllPlayersAfterBoardReady(runner));
 
-            // 3) 🔥 TurnManager는 여기서 생성 (중복 방지)
+            // 3) TurnManager는 여기서 생성 (중복 방지)
             StartCoroutine(SpawnTurnManagerAfterRunnerReady());
         }
     }
@@ -98,6 +101,7 @@ public class GameManager : MonoBehaviour, INetworkRunnerCallbacks
             spawnPoints = GameObject.FindGameObjectsWithTag("SpawnPoint").OrderBy(spawnPoint => spawnPoint.name)
                 .ToArray(); //spawn players
             StartCoroutine(StartAfterLoad());
+            SetupGameOverPanelImmediate();
         }
     }
 
@@ -186,7 +190,8 @@ public class GameManager : MonoBehaviour, INetworkRunnerCallbacks
         foreach (var player in runner.ActivePlayers)
         {
             var index = Mathf.Clamp(player.PlayerId - 1, 0, spawnPoints.Length - 1);
-            var pos = spawnPoints[player.PlayerId - 1].transform.position;
+            //y offset을 주어서 날아가는 것 방지
+            var pos = spawnPoints[player.PlayerId - 1].transform.position + new Vector3(0, 2.5f, 0);
             
             // 새로 스폰
             var newObj = _runner.Spawn(_playerPrefab, pos, Quaternion.identity, player);
@@ -249,6 +254,57 @@ public class GameManager : MonoBehaviour, INetworkRunnerCallbacks
 
         // Seed를 받으면 즉시 보드 생성
         BoardGenerator.Instance.GenerateBoard(seed);
+    }
+    
+    public void RegisterTurnManager(TurnManager tm)
+    {
+        _turnManager = tm;
+        Debug.Log("[GM] TurnManager registered.");
+    }
+    
+    private void SetupGameOverPanelImmediate()
+    {
+        var canvas = GameObject.Find("Canvas");
+        if (canvas == null)
+        {
+            Debug.LogError("[GM] Canvas not found!");
+            return;
+        }
+
+        if (gameOverPanelInstance != null)
+            Destroy(gameOverPanelInstance.gameObject);
+
+        var obj = Instantiate(gameOverPanelPrefab, canvas.transform);
+        gameOverPanelInstance = obj.GetComponent<GameOverPanel>();
+        obj.SetActive(false);
+
+        Debug.Log("[GM] GameOverPanel initialized immediately.");
+    }
+
+    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+    private void RPC_ShowGameOverUI(string winnerName)
+    {
+        _turnManager.EnterGameOverState();
+
+        foreach (var kvp in _spawnedCharacters)
+        {
+            var p = kvp.Value.GetComponent<Player>();
+            if (p != null)
+                p.RPC_OnGameOver();
+        }
+        
+        if (gameOverPanelInstance != null)
+        {
+            gameOverPanelInstance.SetWinner(winnerName);
+            gameOverPanelInstance.Show();
+        }
+
+        Debug.Log($"[GameOver] Winner = {winnerName}");
+    }
+
+    public void RequestShowGameOverUI(string winnerName)
+    {
+        RPC_ShowGameOverUI(winnerName);
     }
 
     #region FusionMethods

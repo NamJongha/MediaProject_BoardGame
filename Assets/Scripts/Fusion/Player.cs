@@ -1,8 +1,10 @@
+using System.Collections;
 using Fusion;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using UnityEngine.SceneManagement;
 
 public class Player : NetworkBehaviour
 {
@@ -15,7 +17,7 @@ public class Player : NetworkBehaviour
     [Networked] public int playerStamina { get; set; } = MaxStamina;
     [Networked] public int chosenBranchIndex { get; set; }
     [Networked] public NetworkBool branchSelected { get; set; }
-    
+    [Networked] private int diceBonus { get; set; } = 0;
     [Networked] public int currentNodeId { get; set; } = -1;
 
     [SerializeField] private GameObject nameObject; //text to show name above the player
@@ -28,12 +30,16 @@ public class Player : NetworkBehaviour
     private ChangeDetector changeDetector;
     private TurnManager turnManager;
 
+    
     [SerializeField] private Button playerButtonPrefab;
     private Button endTurnButtonInstance;
     private Button diceRollButtonInstance;
     private Button useItemButtonInstance;
     private Button viewMapButtonInstance;
     private Button closeMapButtonInstance;
+    
+    private PlayerUIManager playerUIManager;
+    private ItemUIManager itemUIManager;
 
     private bool isMapMode = false;
     
@@ -65,8 +71,8 @@ public class Player : NetworkBehaviour
                 lobby.SetLocalPlayer(this);
                 lobby.UpdateButtonState();
             }
-
             
+
             #region instantiate buttons
 
             endTurnButtonInstance = Instantiate(playerButtonPrefab);
@@ -109,7 +115,7 @@ public class Player : NetworkBehaviour
             closeMapButtonInstance.GetComponentInChildren<TMP_Text>().text = "Close Map";
 
             //Add events on button
-            endTurnButtonInstance.onClick.AddListener(OnEndTurnButtonClicked);
+            //endTurnButtonInstance.onClick.AddListener(OnEndTurnButtonClicked);
             
             //Initialize state
             endTurnButtonInstance.gameObject.SetActive(false);
@@ -119,6 +125,13 @@ public class Player : NetworkBehaviour
             closeMapButtonInstance.gameObject.SetActive(false);
 
             #endregion
+
+            playerUIManager = gameObject.GetComponent<PlayerUIManager>();
+            string currentScene = SceneManager.GetActiveScene().name;
+            if (Object.HasInputAuthority && currentScene == "GAMETEST")
+            {
+                RPC_InitAfterSceneLoad();
+            }
         }
     }
 
@@ -138,14 +151,10 @@ public class Player : NetworkBehaviour
                 if (change == nameof(isPlayerTurn))
                 {
                     Debug.Log("isPlayerTurnChanged");
-                    Debug.Assert(playerButtonPrefab != null);
                     if (Object.HasInputAuthority)
                     {
                         //show button only when the player turn comes
-                        endTurnButtonInstance.gameObject.SetActive(isPlayerTurn);
-                        diceRollButtonInstance.gameObject.SetActive(isPlayerTurn);
-                        useItemButtonInstance.gameObject.SetActive(isPlayerTurn);
-                        viewMapButtonInstance.gameObject.SetActive(isPlayerTurn);
+                        playerUIManager.SetTurnButtonsVisible(isPlayerTurn);
                     }
                 }
 
@@ -194,17 +203,6 @@ public class Player : NetworkBehaviour
 
     #region Button Events
 
-    private void OnEndTurnButtonClicked()
-    {
-        if (Object.HasInputAuthority)
-        {
-            if (isPlayerTurn)
-            {
-                RPC_RequestEndTurn();
-            }
-        }
-    }
-
     [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
     private void RPC_RequestEndTurn()
     {
@@ -215,17 +213,48 @@ public class Player : NetworkBehaviour
 
         turnManager.OnPlayerEndTurn(Object.InputAuthority); //this is for managing turn state in turnManager
     }
-
-    public void RequestRollDice()
+    
+    [Rpc(RpcSources.InputAuthority, RpcTargets.All)]
+    public void RPC_InitAfterSceneLoad()
     {
-        OnDiceRollButtonClicked();
+        Debug.Log($"[Player] InitAfterSceneLoad for {playerName}");
+
+        if (Object.HasInputAuthority)
+        {
+            playerUIManager = FindAnyObjectByType<PlayerUIManager>();
+        }
     }
-    private void OnDiceRollButtonClicked()
+    
+    private IEnumerator InitAfterSceneCoroutine()
+    {
+        yield return new WaitForSeconds(0.3f);
+
+        Debug.Log("[Player] InitAfterSceneCoroutine starting...");
+
+        // 예: ItemUIManager 자동 연결
+        if (itemUIManager == null)
+        {
+            itemUIManager = FindFirstObjectByType<ItemUIManager>();
+            Debug.Log("[Player] ItemUIManager assigned automatically.");
+        }
+
+        // 예: PlayerUIManager 필요하면 추가
+        if (playerUIManager == null)
+        {
+            playerUIManager = FindFirstObjectByType<PlayerUIManager>();
+            Debug.Log("[Player] PlayerUIManager assigned automatically.");
+        }
+
+        Debug.Log("[Player] InitAfterSceneCoroutine Finished!");
+    }
+    
+    public void RequestRollDice()
     {
         if (Object.HasInputAuthority)
         {
             if (isPlayerTurn)
             {
+                playerUIManager.SetTurnButtonsVisible(false);
                 RPC_RequestRollDice();
             }
         }
@@ -259,42 +288,80 @@ public class Player : NetworkBehaviour
         // Update Stamina Text and UI
         LogManager.Instance.Log($"{playerName} stamina is now {playerStamina}");
     }
-    
-    private void OnUseItemButtonClicked()
+    public void RequestOpenItemUI()
     {
-        if (Object.HasInputAuthority)
-        {
-            if (isPlayerTurn)
-            {
-                RPC_RequestUseItem();
-            }
-        }
+        if (!Object.HasInputAuthority) return;
+        if (!isPlayerTurn) return;
+        playerUIManager.SetTurnButtonsVisible(false);
+        RPC_OpenItemUI(Object.InputAuthority);
+    }
+    [Rpc(RpcSources.InputAuthority, RpcTargets.All)]
+    private void RPC_OpenItemUI(PlayerRef owner)
+    {
+        if (itemUIManager == null)
+            itemUIManager = FindFirstObjectByType<ItemUIManager>();
+
+        // UI 노출 (모든 클라이언트)
+        itemUIManager.ShowItemList(this, owner);
+    }
+    public void RequestUseItem(int index)
+    {
+        if (!Object.HasInputAuthority) return;
+        if (!isPlayerTurn) return;
+
+        RPC_RequestUseItem(index);
     }
 
     [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
-    private void RPC_RequestUseItem()
+    private void RPC_RequestUseItem(int index)
     {
-        Debug.Assert(turnManager != null);
-    }
+        var list = GetItemList();
+        if (index < 0 || index >= list.Count)
+        {
+            return;
+        }
 
+        var item = list[index];
+
+        // 아이템 효과 실행
+        item.UseItem(this);
+
+        // 인벤토리 삭제
+        RemoveItem(item);
+
+        // UI 닫기
+        RequestCloseItemUI();
+    }
+    
+    public void RequestCloseItemUI()
+    {
+        RPC_CloseItemUI();
+    }
+    
+    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+    private void RPC_CloseItemUI()
+    {
+        itemUIManager.CloseUI();
+        
+        if (Object.HasInputAuthority)
+        {
+            playerUIManager.SetTurnButtonsVisible(true);
+        }
+    }
+    
     public void RequestControlMap()
     {
-        OnMapControlButtonClicked();
-    }
-    
-    private void OnMapControlButtonClicked()
-    {
         if (Object.HasInputAuthority)
         {
             if (isPlayerTurn)
             {
-                RPC_RequestViewMap();
+                RPC_RequestControlViewMap();
             }
         }
     }
 
     [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
-    private void RPC_RequestViewMap()
+    private void RPC_RequestControlViewMap()
     {
         if (turnManager == null)
         {
@@ -314,39 +381,23 @@ public class Player : NetworkBehaviour
     {
         if (entering)
         {
-            // 맵뷰 진입
             CameraManager.Instance.EnterViewMap();
 
             if (Object.HasInputAuthority)
             {
-                SetTurnButtonsVisible(false);
-                viewMapButtonInstance.gameObject.SetActive(false);
-                closeMapButtonInstance.gameObject.SetActive(true);
+                playerUIManager.EnterMapViewUI();
             }
         }
         else
         {
-            // 맵뷰 종료
             CameraManager.Instance.ExitViewMap();
             CameraManager.Instance.SetPlayerCamera(this.Object);
 
             if (Object.HasInputAuthority)
             {
-                SetTurnButtonsVisible(true);
-                viewMapButtonInstance.gameObject.SetActive(true);
-                closeMapButtonInstance.gameObject.SetActive(false);
+                playerUIManager.ExitMapViewUI();
             }
         }
-    }
-        
-    public void SetTurnButtonsVisible(bool visible)
-    {
-        if (endTurnButtonInstance != null)
-            endTurnButtonInstance.gameObject.SetActive(visible);
-        if (diceRollButtonInstance != null)
-            diceRollButtonInstance.gameObject.SetActive(visible);
-        if (useItemButtonInstance != null)
-            useItemButtonInstance.gameObject.SetActive(visible);
     }
 
     #endregion
@@ -443,10 +494,77 @@ public class Player : NetworkBehaviour
         playerStamina = Mathf.Clamp(playerStamina + amount, MinStamina, MaxStamina);
     }
     
+    public bool AddItem(IItemStrategy item)
+    {
+        if (item == null)
+        {
+            Debug.LogError("[Player] Null 아이템은 추가할 수 없습니다.");
+            return false;
+        }
+
+        if (playerItemList.Count >= 3)
+        {
+            Debug.Log($"[Player] {playerName} 아이템 슬롯이 가득 찼습니다.");
+            LogManager.Instance.Log($"[Player] {playerName} inventory is full!");
+            return false;
+        }
+
+        playerItemList.Add(item);
+
+        LogManager.Instance.Log($"[Player] {playerName} got Item: {item.GetName()}");
+/*
+        // 아이템 UI 업데이트 (존재할 경우)
+        if (ItemUIManager.Instance != null)
+            ItemUIManager.Instance.RefreshUI(this);
+*/
+        return true;
+    }
+
+    public bool RemoveItem(IItemStrategy item)
+    {
+        if (item == null)
+        {
+            Debug.LogError("[Player] RemoveItem()에 null이 전달됨");
+            return false;
+        }
+
+        if (!playerItemList.Contains(item))
+        {
+            Debug.LogWarning($"[Player] {playerName} 아이템 리스트에 없음: {item.GetName()}");
+            return false;
+        }
+
+        playerItemList.Remove(item);
+
+        Debug.Log($"[Player] {playerName} used item: {item.GetName()}");
+        LogManager.Instance.Log($"[Player] {playerName} used item: {item.GetName()}");
+/*
+        // 사용 후 UI 업데이트
+        if (ItemUIManager.Instance != null)
+            ItemUIManager.Instance.RefreshUI(this);
+*/
+        return true;
+    }
+
+    public void AddDiceBonus(int bonus)
+    {
+        diceBonus += bonus;
+        LogManager.Instance.Log($"{playerName} received dice bonus: +{bonus}");
+    }
     [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
     public void RPC_ChooseBranch(int index)
     {
         chosenBranchIndex = index;
         branchSelected = true;
+    }
+    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+    public void RPC_OnGameOver()
+    {
+        if (playerUIManager != null)
+        {
+            playerUIManager.SetTurnButtonsVisible(false);
+        }
+
+        isPlayerTurn = false;
     }
 }

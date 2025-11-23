@@ -8,7 +8,10 @@ public class StaminaUpEffect : SpecialTileEffectBase
 
     public override void ApplyEffect(Player target)
     {
-        if (target == null || !target.Object.HasStateAuthority) return;
+        if (target == null || !target.Object.HasStateAuthority)
+        {
+            return;
+        }
         target.ModifyStamina(amount);
         LogManager.Instance.Log($"[SpecialTileEffect] {target.playerName} stamina +{amount}");
     }
