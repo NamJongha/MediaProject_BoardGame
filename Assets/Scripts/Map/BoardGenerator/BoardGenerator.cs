@@ -87,10 +87,10 @@ public class BoardGenerator : MonoBehaviour
         // 메인 경로 + 브랜치 생성
         pathGenerator.GenerateMainPath(this, allNodes, tileSize);
 
+        StartCoroutine(pathGenerator.GenerateBranches(this, allNodes, tileSize));
+                
         // Goal 노드 추가
         CreateGoalNode();
-
-        StartCoroutine(pathGenerator.GenerateBranches(this, allNodes, tileSize));
         
         // 브랜치 생성 코루틴이 끝나도록 약간 기다렸다가 특수 타일 생성
         StartCoroutine(WaitAndGenerateSpecialTiles());

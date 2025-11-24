@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using Fusion;
+using System.Linq;
 
 public class PlayerMover : NetworkBehaviour
 {
@@ -68,27 +69,60 @@ public class PlayerMover : NetworkBehaviour
         
         for (int i = 0; i < steps; i++)
         {
-            // 다음 노드가 없으면 중단
+            // goal 체크
+            if (finalNode.nodeType == NodeType.Goal)
+            {
+                LogManager.Instance.Log($"[PlayerMover] Goal reached at Node {finalNode.id}, stopping.");
+                GameManager.Instance.RequestShowGameOverUI(player.name);
+
+                SetCurrentNode(finalNode);
+                player.currentNodeId = finalNode.id;
+                isMoving = false;
+                break;
+            }
+            
+            // destroy된 노드 제거
+            if (finalNode.nextNodes != null)
+            {
+                finalNode.nextNodes = finalNode.nextNodes
+                    .Where(n => n != null)
+                    .ToList();
+            }
+
+            // 노드 없음
             if (finalNode.nextNodes == null || finalNode.nextNodes.Count == 0)
             {
-                Debug.Log($"[PlayerMover] No more nodes to move. Stopping at final node: {finalNode.id}");
+                Debug.Log($"[PlayerMover] No valid next nodes at {finalNode.id}");
                 break;
             }
 
-            // ---- 브랜치 발생 시 UI 선택 대기 ----
-            if (finalNode.nextNodes.Count > 1)
+            bool nextIsGoal = finalNode.nextNodes.Exists(n => n != null && n.nodeType == NodeType.Goal);
+            
+            // branch + goal 우선 처리
+            if (finalNode.nextNodes.Count > 1 && !nextIsGoal)
             {
-                // 🔥 여기 수정됨: Player 전달
-                yield return StartCoroutine(ChoosePath(finalNode, player));
+                    yield return StartCoroutine(ChoosePath(finalNode, player));
             }
 
             BoardNode nextNode = finalNode.nextNodes[0];
-            yield return StartCoroutine(MoveToNode(nextNode, triggerEventOnArrival: false));
+            yield return StartCoroutine(MoveToNode(nextNode, false));
             finalNode = nextNode;
         }
 
+
         // 마지막 노드에서 이벤트 실행
-        yield return StartCoroutine(MoveToNode(finalNode, triggerEventOnArrival: true));
+        yield return StartCoroutine(
+            MoveToNode(finalNode, triggerEventOnArrival: true)
+        );
+
+        if (finalNode.nodeType == NodeType.Goal)
+        {
+            Debug.Log("[PlayerMover] Goal event executed. Movement fully completed.");
+            SetCurrentNode(finalNode);
+            player.currentNodeId = finalNode.id;
+            isMoving = false;
+            yield break;
+        }
 
         if (finalNode.nextNodes == null || finalNode.nextNodes.Count == 0)
         {
@@ -134,6 +168,8 @@ public class PlayerMover : NetworkBehaviour
         }
 
         node.nextNodes.Clear();
+        
+        node.nextNodes.Add(chosen);
 
         player.branchSelected = false;
     }

@@ -13,9 +13,21 @@ public class CameraManager : NetworkBehaviour
     [SerializeField] private float cameraSpeedOffset;
 
     private bool isSpawned = false;
+    private bool isViewMap = false;
     
     [Networked] public bool isWatchingPlayer { get; set; } = false;
     [Networked] public NetworkObject currentPlayer { get; set; }
+    //View Map start point
+    [SerializeField] private Vector3 viewMapStartPos = new Vector3(0, 120, 0);
+    [SerializeField] private Vector3 viewMapStartRot = new Vector3(90, 0, 0);
+    
+    //Camera movement range
+    [SerializeField] private Vector2 clampX = new Vector2(10, 1260);
+    [SerializeField] private Vector2 clampZ = new Vector2(-60, 80);
+    [SerializeField] private Vector2 clampY = new Vector2(80, 180);
+    //Camera moving speed
+    [SerializeField] private float mapMoveSpeed = 150f;
+    [SerializeField] private float mapZoomSpeed = 300f;
 
     public override void Spawned()
     {
@@ -27,6 +39,14 @@ public class CameraManager : NetworkBehaviour
         Instance = this;
     }
 
+    private void Update()
+    {
+        if (isViewMap)
+        {
+            HandleViewMapControls();
+        }
+    }
+    
     private void FixedUpdate()
     {
         if (!isSpawned) return;
@@ -53,8 +73,60 @@ public class CameraManager : NetworkBehaviour
     }
 
     //method to look at somewhere else
-    public void SetPointCamera()
+    public void EnterViewMap()
     {
         isWatchingPlayer = false;
+        isViewMap = true;
+
+        // 기본 위치로 이동
+        mainCamera.transform.position = viewMapStartPos;
+        mainCamera.transform.rotation = Quaternion.Euler(viewMapStartRot);
     }
+
+    public void ExitViewMap()
+    {
+        isViewMap = false;
+        isWatchingPlayer = true;
+    }
+    
+    private void HandleViewMapControls()
+    {
+        Vector3 pos = mainCamera.transform.position;
+
+        // WASD 이동
+        float h = Input.GetAxis("Horizontal");
+        float v = Input.GetAxis("Vertical");
+        pos += new Vector3(h, 0, v) * mapMoveSpeed * Time.deltaTime;
+
+        // 마우스 드래그 이동
+        if (Input.GetMouseButton(2))
+        {
+            pos -= mainCamera.transform.right * Input.GetAxis("Mouse X") * mapMoveSpeed * Time.deltaTime;
+            pos -= mainCamera.transform.up * Input.GetAxis("Mouse Y") * mapMoveSpeed * Time.deltaTime;
+        }
+
+        // 마우스 휠 줌
+        float scroll = Input.GetAxis("Mouse ScrollWheel");
+        pos += mainCamera.transform.forward * scroll * mapZoomSpeed * Time.deltaTime;
+
+        // 범위 제한 (Clamp)
+        pos.x = Mathf.Clamp(pos.x, clampX.x, clampX.y);
+        pos.z = Mathf.Clamp(pos.z, clampZ.x, clampZ.y);
+        pos.y = Mathf.Clamp(pos.y, clampY.x, clampY.y);
+
+        mainCamera.transform.position = pos;
+    }
+
+    public void ToggleMapView()
+    {
+        if (!isViewMap)
+        {
+            EnterViewMap();
+        }
+        else
+        {
+            ExitViewMap();
+        }
+    }
+
 }

@@ -1749,6 +1749,18 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1115253822854428266, guid: f150f4fbbf43a6b4c99a30e10d63d612, type: 3}
+      propertyPath: winnerText
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 1115253822854428266, guid: f150f4fbbf43a6b4c99a30e10d63d612, type: 3}
+      propertyPath: gameOverPanel
+      value: 
+      objectReference: {fileID: 1604381962835885149, guid: b16e4a3085452284b94997a144c975ad, type: 3}
+    - target: {fileID: 1115253822854428266, guid: f150f4fbbf43a6b4c99a30e10d63d612, type: 3}
+      propertyPath: gameOverPanelPrefab
+      value: 
+      objectReference: {fileID: 1604381962835885149, guid: b16e4a3085452284b94997a144c975ad, type: 3}
     - target: {fileID: 2450222800750954695, guid: f150f4fbbf43a6b4c99a30e10d63d612, type: 3}
       propertyPath: m_LocalPosition.x
       value: -9.78579

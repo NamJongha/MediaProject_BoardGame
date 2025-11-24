@@ -6,7 +6,13 @@ public class ItemGetEffect : SpecialTileEffectBase
 {
     public override void ApplyEffect(Player target)
     {
-        if (target == null || !target.Object.HasStateAuthority) return;
-        LogManager.Instance.Log($"[SpecialTileEffect] {target.playerName} Get item!");
+        if (ItemManager.Instance == null)
+        {
+            Debug.LogError("[ItemGetEffect] ItemManager.Instance가 없습니다!");
+            return;
+        }
+
+        ItemManager.Instance.GiveRandomItemToPlayer(target);
     }
+
 }   
