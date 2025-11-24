@@ -5,6 +5,7 @@ using Fusion;
 using Manager.TurnState;
 using UnityEngine;
 using UnityEngine.UI;
+using TurnGameOverState = Manager.TurnState.TurnGameOverState;
 
 public class TurnManager : NetworkBehaviour
 {
@@ -35,6 +36,8 @@ public class TurnManager : NetworkBehaviour
 
     private void Awake()
     {
+        Instance = this;
+        
         waitingForOrderState = new WaitingForOrderState(this);
         decidingOrderState = new DecidingOrderState(this);
         turnStartState = new TurnStartState(this);
@@ -93,6 +96,11 @@ public class TurnManager : NetworkBehaviour
             // 필수 버튼 둘 다 연결되었으면 종료
             if (turnDecideButton != null && turnStartButton != null)
             {
+                if (Runner.IsServer)
+                {
+                    turnDecideButton.gameObject.SetActive(true);
+                }
+                
                 Debug.Log("[TM] Essential UI buttons connected");
                 yield break;
             }
@@ -103,148 +111,60 @@ public class TurnManager : NetworkBehaviour
         Debug.LogWarning("[TM] Timeout binding essential buttons!");
     }
 
-    private IEnumerator WaitAndBindRuntimeButtons()
-    {
-        Debug.Log("[TM] WaitAndBindRuntimeButtons START");
-
-        // UIManager가 버튼들을 생성할 시간을 기다린다
-        for (int i = 0; i < 50; i++)
-        {
-            var buttons = FindObjectsByType<Button>(FindObjectsInactive.Include, FindObjectsSortMode.None);
-
-            foreach (var btn in buttons)
-            {
-                switch (btn.name)
-                {
-                    case "DiceRollButton":
-                        rollDiceButton = btn;
-                        rollDiceButton.onClick.RemoveAllListeners();
-                        rollDiceButton.onClick.AddListener(OnClickRollDice);
-                        Debug.Log("[TM] DiceRollButton connected");
-                        break;
-
-                    case "UseItemButton":
-                        useItemButton = btn;
-                        useItemButton.onClick.RemoveAllListeners();
-                        useItemButton.onClick.AddListener(OnClickOpenItemUI);
-                        Debug.Log("[TM] UseItemButton connected");
-                        break;
-                    
-                    case "ViewMapButton":
-                        viewMapButton = btn;
-                        viewMapButton.onClick.RemoveAllListeners();
-                        viewMapButton.onClick.AddListener(OnClickViewMap);
-                        Debug.Log("[TM] ViewMapButton connected");
-                        break;
-                    
-                    case "CloseMapButton":
-                        closeMapButton = btn;
-                        closeMapButton.onClick.RemoveAllListeners();
-                        closeMapButton.onClick.AddListener(OnClickCloseMap);
-                        Debug.Log("[TM] CloseMapButton connected");
-                        break;
-                }
-            }
-
-            if (rollDiceButton != null && useItemButton != null)
-            {
-                Debug.Log("[TM] Runtime UI buttons connected!");
-                yield break;
-            }
-
-            yield return new WaitForSeconds(0.1f);
-        }
-
-        Debug.LogWarning("[TM] Timeout binding runtime buttons!");
-    }
-    private IEnumerator WaitAndBindInitialButtons()
-    {
-        yield return new WaitForSeconds(0.5f);
-
-        for (int i = 0; i < 50; i++)
-        {
-            var buttons = FindObjectsByType<Button>(FindObjectsInactive.Include, FindObjectsSortMode.None);
-
-            foreach (var btn in buttons)
-            {
-                if (btn.name == "OrderDecideButton") //its name was wrong: turnDecideButton -> OrderDecideButton
-                {
-                    turnDecideButton = btn;
-                    turnDecideButton.onClick.RemoveAllListeners();
-                    turnDecideButton.onClick.AddListener(OnDecideButtonClicked);
-                    Debug.Log("[TM] TurnDecideButton connected");
-                }
-
-                if (btn.name == "TurnStartButton")
-                {
-                    turnStartButton = btn;
-                    turnStartButton.onClick.RemoveAllListeners();
-                    turnStartButton.onClick.AddListener(OnTurnStartButtonClicked);
-                    Debug.Log("[TM] TurnStartButton connected");
-                }
-            }
-
-            // 필수 버튼 둘 다 연결되었으면 종료
-            if (turnDecideButton != null && turnStartButton != null)
-            {
-                Debug.Log("[TM] Essential UI buttons connected");
-                yield break;
-            }
-
-            yield return new WaitForSeconds(0.1f);
-        }
-
-        Debug.LogWarning("[TM] Timeout binding essential buttons!");
-    }
-
-    private IEnumerator WaitAndBindRuntimeButtons()
-    {
-        Debug.Log("[TM] WaitAndBindRuntimeButtons START");
-
-        // UIManager가 버튼들을 생성할 시간을 기다린다
-        for (int i = 0; i < 50; i++)
-        {
-            var buttons = FindObjectsByType<Button>(FindObjectsInactive.Include, FindObjectsSortMode.None);
-
-            foreach (var btn in buttons)
-            {
-                switch (btn.name)
-                {
-                    case "DiceRollButton":
-                        rollDiceButton = btn;
-                        rollDiceButton.onClick.RemoveAllListeners();
-                        rollDiceButton.onClick.AddListener(OnClickRollDice);
-                        Debug.Log("[TM] DiceRollButton connected");
-                        break;
-
-                    case "UseItemButton":
-                        useItemButton = btn;
-                        useItemButton.onClick.RemoveAllListeners();
-                        useItemButton.onClick.AddListener(OnClickUseItem);
-                        Debug.Log("[TM] UseItemButton connected");
-                        break;
-
-                    case "ViewMapButton":
-                        viewMapButton = btn;
-                        viewMapButton.onClick.RemoveAllListeners();
-                        viewMapButton.onClick.AddListener(OnClickViewMap);
-                        Debug.Log("[TM] ViewMapButton connected");
-                        break;
-                }
-            }
-
-            if (rollDiceButton != null && useItemButton != null && viewMapButton != null)
-            {
-                Debug.Log("[TM] Runtime UI buttons connected!");
-                yield break;
-            }
-
-            yield return new WaitForSeconds(0.1f);
-        }
-
-        Debug.LogWarning("[TM] Timeout binding runtime buttons!");
-    }
-
+    //private IEnumerator WaitAndBindRuntimeButtons()
+    //{
+    //    Debug.Log("[TM] WaitAndBindRuntimeButtons START");
+//
+    //    // UIManager가 버튼들을 생성할 시간을 기다린다
+    //    for (int i = 0; i < 50; i++)
+    //    {
+    //        var buttons = FindObjectsByType<Button>(FindObjectsInactive.Include, FindObjectsSortMode.None);
+//
+    //        foreach (var btn in buttons)
+    //        {
+    //            switch (btn.name)
+    //            {
+    //                case "DiceRollButton":
+    //                    rollDiceButton = btn;
+    //                    rollDiceButton.onClick.RemoveAllListeners();
+    //                    rollDiceButton.onClick.AddListener(OnClickRollDice);
+    //                    Debug.Log("[TM] DiceRollButton connected");
+    //                    break;
+//
+    //                case "UseItemButton":
+    //                    useItemButton = btn;
+    //                    useItemButton.onClick.RemoveAllListeners();
+    //                    useItemButton.onClick.AddListener(OnClickOpenItemUI);
+    //                    Debug.Log("[TM] UseItemButton connected");
+    //                    break;
+    //                
+    //                case "ViewMapButton":
+    //                    viewMapButton = btn;
+    //                    viewMapButton.onClick.RemoveAllListeners();
+    //                    viewMapButton.onClick.AddListener(OnClickViewMap);
+    //                    Debug.Log("[TM] ViewMapButton connected");
+    //                    break;
+    //                
+    //                case "CloseMapButton":
+    //                    closeMapButton = btn;
+    //                    closeMapButton.onClick.RemoveAllListeners();
+    //                    closeMapButton.onClick.AddListener(OnClickCloseMap);
+    //                    Debug.Log("[TM] CloseMapButton connected");
+    //                    break;
+    //            }
+    //        }
+//
+    //        if (rollDiceButton != null && useItemButton != null)
+    //        {
+    //            Debug.Log("[TM] Runtime UI buttons connected!");
+    //            yield break;
+    //        }
+//
+    //        yield return new WaitForSeconds(0.1f);
+    //    }
+//
+    //    Debug.LogWarning("[TM] Timeout binding runtime buttons!");
+    //}
 
     private IEnumerator DelayedInitState()
     {
@@ -283,68 +203,73 @@ public class TurnManager : NetworkBehaviour
         {
             ChangeState(turnStartState); // deciding turn state -> turn start state
             StartTurn();
-            StartCoroutine(WaitAndBindRuntimeButtons());
+            //StartCoroutine(WaitAndBindRuntimeButtons());
         }
     }
 
-    private Player GetCurrentTurnPlayer()
+    public Player GetCurrentTurnPlayer()
     {
+        Debug.Assert(gameManager.GetPlayersList() != null);
         foreach (var kvp in gameManager.GetPlayersList())
         {
-            var p = kvp.Value.GetComponent<Player>();
+            NetworkObject playerObject = kvp.Value;
+            Player p = playerObject.gameObject.GetComponent<Player>();
             if (p.isPlayerTurn)
+            {
+                Debug.Log("current player: " + p.playerName);
                 return p;
+            }
         }
-
+        Debug.Log("Current Turn Player not detected");
         return null;
     }
 
-    private void OnClickRollDice()
-    {
-        LogManager.Instance.Log("Roll Dice Button Click detected");
+    //private void OnClickRollDice()
+    //{
+    //    LogManager.Instance.Log("Roll Dice Button Click detected");
+//
+    //    var current = GetCurrentTurnPlayer();
+    //    if (current != null)
+    //    {
+    //        current.RequestRollDice();
+    //    }
+    //}
+//
+    //private void OnClickOpenItemUI()
+    //{
+    //    LogManager.Instance.Log("Use Item Button Click detected");
+//
+    //    var current = GetCurrentTurnPlayer();
+    //    if (current != null)
+    //    {
+    //        if (current != null)
+    //        {
+    //            current.RequestOpenItemUI();
+    //        }
+    //    }
+    //}
 
-        var current = GetCurrentTurnPlayer();
-        if (current != null)
-        {
-            current.RequestRollDice();
-        }
-    }
+   //private void OnClickViewMap()
+   //{
+   //    LogManager.Instance.Log("Use Item Button Click detected");
 
-    private void OnClickOpenItemUI()
-    {
-        LogManager.Instance.Log("Use Item Button Click detected");
+   //    var current = GetCurrentTurnPlayer();
+   //    if (current != null)
+   //    {
+   //        current.RequestControlMap();
+   //    }
+   //}
+   //
+   //private void OnClickCloseMap()
+   //{
+   //    LogManager.Instance.Log("Use Item Button Click detected");
 
-        var current = GetCurrentTurnPlayer();
-        if (current != null)
-        {
-            if (current != null)
-            {
-                current.RequestOpenItemUI();
-            }
-        }
-    }
-
-    private void OnClickViewMap()
-    {
-        LogManager.Instance.Log("Use Item Button Click detected");
-
-        var current = GetCurrentTurnPlayer();
-        if (current != null)
-        {
-            current.RequestControlMap();
-        }
-    }
-    
-    private void OnClickCloseMap()
-    {
-        LogManager.Instance.Log("Use Item Button Click detected");
-
-        var current = GetCurrentTurnPlayer();
-        if (current != null)
-        {
-            current.RequestControlMap();
-        }
-    }
+   //    var current = GetCurrentTurnPlayer();
+   //    if (current != null)
+   //    {
+   //        current.RequestControlMap();
+   //    }
+   //}
 
     private void DecideTurnOrder()
     {

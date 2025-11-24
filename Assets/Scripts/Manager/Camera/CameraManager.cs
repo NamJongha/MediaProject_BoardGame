@@ -21,6 +21,9 @@ public class CameraManager : NetworkBehaviour
     [SerializeField] private Vector3 viewMapStartPos = new Vector3(0, 120, 0);
     [SerializeField] private Vector3 viewMapStartRot = new Vector3(90, 0, 0);
     
+    [Networked] public Vector3 networkMapCamPos { get; private set; }
+    [Networked] public Vector3 networkMapCamRot { get; private set; }
+    
     //Camera movement range
     [SerializeField] private Vector2 clampX = new Vector2(10, 1260);
     [SerializeField] private Vector2 clampZ = new Vector2(-60, 80);
@@ -28,10 +31,15 @@ public class CameraManager : NetworkBehaviour
     //Camera moving speed
     [SerializeField] private float mapMoveSpeed = 150f;
     [SerializeField] private float mapZoomSpeed = 300f;
+    
+    private bool isLocalPlayerTurn = false;
 
     public override void Spawned()
     {
         isSpawned = true;
+        isWatchingPlayer = false;
+        networkMapCamPos = new Vector3(0, 120, 0);
+        networkMapCamRot = new Vector3(90, 0, 0);
     }
     
     private void Awake()
@@ -39,13 +47,13 @@ public class CameraManager : NetworkBehaviour
         Instance = this;
     }
 
-    private void Update()
-    {
-        if (isViewMap)
-        {
-            HandleViewMapControls();
-        }
-    }
+    //private void Update()
+    //{
+    //    if (isViewMap)
+    //    {
+    //        HandleViewMapControls();
+    //    }
+    //}
     
     private void FixedUpdate()
     {
@@ -56,6 +64,11 @@ public class CameraManager : NetworkBehaviour
             Vector3 targetPosition = (currentPlayer.transform.position + cameraOffset);
             mainCamera.transform.position = Vector3.Lerp(mainCamera.transform.position, targetPosition, cameraSpeedOffset * Time.deltaTime);
             mainCamera.transform.rotation = Quaternion.Euler(cameraRotation);
+        }
+        
+        if (isViewMap)
+        {
+            HandleViewMapControls();
         }
     }
 
@@ -70,6 +83,12 @@ public class CameraManager : NetworkBehaviour
     {
         Instance.currentPlayer = playerObject;
         Instance.isWatchingPlayer = true;
+    }
+    
+    //to check if the user can move the camera(현재 턴이 아닌 플레이어는 못 누르도록 하기)
+    public void SetIsLocalPlayerTurn(bool isLocalPlayerTurn)
+    {
+        this.isLocalPlayerTurn = isLocalPlayerTurn;
     }
 
     //method to look at somewhere else
@@ -91,42 +110,46 @@ public class CameraManager : NetworkBehaviour
     
     private void HandleViewMapControls()
     {
-        Vector3 pos = mainCamera.transform.position;
-
-        // WASD 이동
-        float h = Input.GetAxis("Horizontal");
-        float v = Input.GetAxis("Vertical");
-        pos += new Vector3(h, 0, v) * mapMoveSpeed * Time.deltaTime;
-
-        // 마우스 드래그 이동
-        if (Input.GetMouseButton(2))
+        if (isLocalPlayerTurn)
         {
-            pos -= mainCamera.transform.right * Input.GetAxis("Mouse X") * mapMoveSpeed * Time.deltaTime;
-            pos -= mainCamera.transform.up * Input.GetAxis("Mouse Y") * mapMoveSpeed * Time.deltaTime;
-        }
+            Vector3 pos = mainCamera.transform.position;
 
-        // 마우스 휠 줌
-        float scroll = Input.GetAxis("Mouse ScrollWheel");
-        pos += mainCamera.transform.forward * scroll * mapZoomSpeed * Time.deltaTime;
+            // WASD 이동
+            float h = Input.GetAxis("Horizontal");
+            float v = Input.GetAxis("Vertical");
+            pos += new Vector3(h, 0, v) * mapMoveSpeed * Time.deltaTime;
 
-        // 범위 제한 (Clamp)
-        pos.x = Mathf.Clamp(pos.x, clampX.x, clampX.y);
-        pos.z = Mathf.Clamp(pos.z, clampZ.x, clampZ.y);
-        pos.y = Mathf.Clamp(pos.y, clampY.x, clampY.y);
+            // 마우스 드래그 이동
+            if (Input.GetMouseButton(2))
+            {
+                pos -= mainCamera.transform.right * Input.GetAxis("Mouse X") * mapMoveSpeed * Time.deltaTime;
+                pos -= mainCamera.transform.up * Input.GetAxis("Mouse Y") * mapMoveSpeed * Time.deltaTime;
+            }
 
-        mainCamera.transform.position = pos;
-    }
+            // 마우스 휠 줌
+            float scroll = Input.GetAxis("Mouse ScrollWheel");
+            pos += mainCamera.transform.forward * scroll * mapZoomSpeed * Time.deltaTime;
 
-    public void ToggleMapView()
-    {
-        if (!isViewMap)
-        {
-            EnterViewMap();
+            // 범위 제한 (Clamp)
+            pos.x = Mathf.Clamp(pos.x, clampX.x, clampX.y);
+            pos.z = Mathf.Clamp(pos.z, clampZ.x, clampZ.y);
+            pos.y = Mathf.Clamp(pos.y, clampY.x, clampY.y);
+
+            mainCamera.transform.position = pos;
+
+            RPC_UpdateCamera(pos, viewMapStartRot);
         }
         else
         {
-            ExitViewMap();
+            mainCamera.transform.position = Vector3.Lerp(mainCamera.transform.position, networkMapCamPos, mapMoveSpeed * Runner.DeltaTime);
+            mainCamera.transform.rotation = Quaternion.Euler(networkMapCamRot);
         }
     }
-
+    
+    [Rpc(RpcSources.All, RpcTargets.StateAuthority)]
+    public void RPC_UpdateCamera(Vector3 pos, Vector3 rot)
+    {
+        networkMapCamPos = pos;
+        networkMapCamRot = rot;
+    }
 }

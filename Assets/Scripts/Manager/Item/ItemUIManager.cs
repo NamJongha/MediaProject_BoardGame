@@ -14,9 +14,11 @@ public class ItemUIManager : MonoBehaviour
     [SerializeField] private TMP_Text noItemText;
     private Player currentPlayer;
     private Player currentOwner;
-    private PlayerRef ownerRef;
+    //private PlayerRef ownerRef;
     
     private NetworkRunner runner;
+    
+    public static ItemUIManager Instance;
     
     private void Awake()
     {
@@ -30,17 +32,19 @@ public class ItemUIManager : MonoBehaviour
                 currentPlayer.RequestCloseItemUI();   // ← Player → RPC → UI 닫기
             }
         });
+
+        Instance = this;
     }
     
-    public void ShowItemList(Player ownerPlayer, PlayerRef ownerRef)
+    public void ShowItemList(Player ownerPlayer/*, PlayerRef ownerRef*/)
     {
         panelItemUI.SetActive(true);
 
         currentOwner = ownerPlayer;  // UI 주인 저장
-        this.ownerRef = ownerRef;    // LocalPlayer와 비교할 때 사용
+        //this.ownerRef = ownerRef;    // LocalPlayer와 비교할 때 사용
         currentPlayer = ownerPlayer; // UpdateItemListUI()에서 사용하는 값
-
-        RefreshButtons(ownerPlayer);
+        UpdateItemListUI();
+        //RefreshButtons(ownerPlayer);
     }
 
     public void UpdateItemListUI()
@@ -62,80 +66,94 @@ public class ItemUIManager : MonoBehaviour
         
         for (int i = 0; i < itemButtons.Length; i++)
         {
-            Sprite ItemImage = playerItemList[i].GetItemSprite();
-            itemButtons[i].GetComponent<Image>().sprite = ItemImage;
-            itemButtons[i].gameObject.SetActive(true);
-            itemButtons[i].onClick.RemoveAllListeners();
-            int index = i;
-            itemButtons[i].onClick.AddListener(() => OnItemButtonClicked(playerItemList[index]));
-
             if (i >= playerItemList.Count)
             {
                 itemButtons[i].gameObject.SetActive(false);
                 continue;
             }
+            
+            Sprite ItemImage = playerItemList[i].GetItemSprite();
+            itemButtons[i].GetComponent<Image>().sprite = ItemImage;
+            itemButtons[i].gameObject.SetActive(true);
+            itemButtons[i].onClick.RemoveAllListeners();
+            
+            int index = i;
+            itemButtons[i].onClick.AddListener(() => OnItemButtonClicked(playerItemList[index]));
         }
     }
 
     private void OnItemButtonClicked(IItemStrategy item)
     {
-        //Show target list (button, show player's name), except item used player
-        targetUI.ShowTargetList(currentPlayer);
-        Player targetPlayer = targetUI.GetTargetPlayer();
-        if (targetPlayer == null)
+        if (item.GetName() == "Recover Stamina")
         {
-            Debug.LogWarning("Target not selected!");
-            return;
+            item.UseItem(currentPlayer);
         }
-        item.UseItem(targetPlayer);
-        UpdateItemListUI();
-        targetUI.ResetTargetPlayer();
+        
+        //Show target list (button, show player's name), except item used player
+        
+        //targetUI.ShowTargetList(currentPlayer);
+        //
+        //Player targetPlayer = targetUI.GetTargetPlayer();
+        //if (targetPlayer == null)
+        //{
+        //    Debug.LogWarning("Target not selected!");
+        //    return;
+        //}
+        //item.UseItem(targetPlayer);
+        //UpdateItemListUI();
+        //targetUI.ResetTargetPlayer();
+        //
+        //foreach (Button itemButton in itemButtons)
+        //{
+        //    itemButton.gameObject.SetActive(false);
+        //}
     }
+    
     public void CloseUI()
     {
         panelItemUI.SetActive(false);
     }
     
-    public void RefreshButtons(Player ownerPlayer)
-    {
-        var items = ownerPlayer.GetItemList();
-        var runner = FindFirstObjectByType<NetworkRunner>();
-        
-        // 🟩 Runner null 여부 먼저 확인
-        bool isOwner = false;
-        if (runner != null)
-        {
-            isOwner = (runner.LocalPlayer == ownerRef);
-        }
-
-        for (int i = 0; i < itemButtons.Length; i++)
-        {
-            if (i < items.Count)
-            {
-                itemButtons[i].gameObject.SetActive(true);
-                itemButtons[i].GetComponent<Image>().sprite = items[i].GetItemSprite();
-
-                Button btn = itemButtons[i];
-
-                // 🟩 네트워크 준비되지 않으면 interactable = false
-                btn.interactable = isOwner;
-
-                int index = i;
-                btn.onClick.RemoveAllListeners();
-
-                if (isOwner)
-                {
-                    btn.onClick.AddListener(() =>
-                    {
-                        ownerPlayer.RequestUseItem(index);
-                    });
-                }
-            }
-            else
-            {
-                itemButtons[i].gameObject.SetActive(false);
-            }
-        }
-    }
-
+    //public void RefreshButtons(Player ownerPlayer)
+    //{
+    //    var items = ownerPlayer.GetItemList();
+    //    var runner = FindFirstObjectByType<NetworkRunner>();
+    //    
+    //    // 🟩 Runner null 여부 먼저 확인
+    //    bool isOwner = false;
+    //    if (runner != null)
+    //    {
+    //        isOwner = (runner.LocalPlayer == ownerRef);
+    //    }
+//
+    //    for (int i = 0; i < itemButtons.Length; i++)
+    //    {
+    //        if (i < items.Count)
+    //        {
+    //            itemButtons[i].gameObject.SetActive(true);
+    //            itemButtons[i].GetComponent<Image>().sprite = items[i].GetItemSprite();
+//
+    //            Button btn = itemButtons[i];
+//
+    //            // 🟩 네트워크 준비되지 않으면 interactable = false
+    //            btn.interactable = isOwner;
+//
+    //            int index = i;
+    //            btn.onClick.RemoveAllListeners();
+//
+    //            if (isOwner)
+    //            {
+    //                btn.onClick.AddListener(() =>
+    //                {
+    //                    ownerPlayer.RequestUseItem(index);
+    //                });
+    //            }
+    //        }
+    //        else
+    //        {
+    //            itemButtons[i].gameObject.SetActive(false);
+    //        }
+    //    }
+    //}
+//
 }

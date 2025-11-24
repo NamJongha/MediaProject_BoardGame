@@ -2067,7 +2067,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &140843026
 RectTransform:
   m_ObjectHideFlags: 0
@@ -3950,6 +3950,8 @@ MonoBehaviour:
   _currentPlayer: {fileID: 0}
   viewMapStartPos: {x: 0, y: 120, z: 0}
   viewMapStartRot: {x: 90, y: 0, z: 0}
+  _networkMapCamPos: {x: 0, y: 0, z: 0}
+  _networkMapCamRot: {x: 0, y: 0, z: 0}
   clampX: {x: 10, y: 1260}
   clampZ: {x: -60, y: 80}
   clampY: {x: 80, y: 180}
@@ -5898,7 +5900,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &406030905
 RectTransform:
   m_ObjectHideFlags: 0

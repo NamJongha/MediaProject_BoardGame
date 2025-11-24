@@ -73,7 +73,7 @@ public class Player : NetworkBehaviour
             }
             
 
-            #region instantiate buttons
+            /*#region instantiate buttons
 
             endTurnButtonInstance = Instantiate(playerButtonPrefab);
 
@@ -124,7 +124,7 @@ public class Player : NetworkBehaviour
             viewMapButtonInstance.gameObject.SetActive(false);
             closeMapButtonInstance.gameObject.SetActive(false);
 
-            #endregion
+            #endregion*/
 
             playerUIManager = gameObject.GetComponent<PlayerUIManager>();
             string currentScene = SceneManager.GetActiveScene().name;
@@ -248,7 +248,7 @@ public class Player : NetworkBehaviour
         Debug.Log("[Player] InitAfterSceneCoroutine Finished!");
     }
     
-    public void RequestRollDice()
+    public void OnDiceRollButtonClicked()
     {
         if (Object.HasInputAuthority)
         {
@@ -288,30 +288,32 @@ public class Player : NetworkBehaviour
         // Update Stamina Text and UI
         LogManager.Instance.Log($"{playerName} stamina is now {playerStamina}");
     }
-    public void RequestOpenItemUI()
-    {
-        if (!Object.HasInputAuthority) return;
-        if (!isPlayerTurn) return;
-        playerUIManager.SetTurnButtonsVisible(false);
-        RPC_OpenItemUI(Object.InputAuthority);
-    }
-    [Rpc(RpcSources.InputAuthority, RpcTargets.All)]
-    private void RPC_OpenItemUI(PlayerRef owner)
-    {
-        if (itemUIManager == null)
-            itemUIManager = FindFirstObjectByType<ItemUIManager>();
-
-        // UI 노출 (모든 클라이언트)
-        itemUIManager.ShowItemList(this, owner);
-    }
+    
+    //public void RequestOpenItemUI()
+    //{
+    //    if (!Object.HasInputAuthority) return;
+    //    if (!isPlayerTurn) return;
+    //    playerUIManager.SetTurnButtonsVisible(false);
+    //    RPC_OpenItemUI(Object.InputAuthority);
+    //}
+    //[Rpc(RpcSources.InputAuthority, RpcTargets.All)]
+    //private void RPC_OpenItemUI(PlayerRef owner)
+    //{
+    //    if (itemUIManager == null)
+    //        itemUIManager = FindFirstObjectByType<ItemUIManager>();
+//
+    //    // UI 노출 (모든 클라이언트)
+    //    itemUIManager.ShowItemList(this, owner);
+    //}
+    
     public void RequestUseItem(int index)
     {
         if (!Object.HasInputAuthority) return;
         if (!isPlayerTurn) return;
-
+//
         RPC_RequestUseItem(index);
     }
-
+//
     [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
     private void RPC_RequestUseItem(int index)
     {
@@ -320,15 +322,15 @@ public class Player : NetworkBehaviour
         {
             return;
         }
-
+//
         var item = list[index];
-
+//
         // 아이템 효과 실행
         item.UseItem(this);
-
+//
         // 인벤토리 삭제
         RemoveItem(item);
-
+//
         // UI 닫기
         RequestCloseItemUI();
     }
@@ -349,7 +351,7 @@ public class Player : NetworkBehaviour
         }
     }
     
-    public void RequestControlMap()
+    public void OnMapControlButtonClicked()
     {
         if (Object.HasInputAuthority)
         {
@@ -357,6 +359,7 @@ public class Player : NetworkBehaviour
             {
                 RPC_RequestControlViewMap();
             }
+            CameraManager.Instance.SetIsLocalPlayerTurn(isPlayerTurn);
         }
     }
 
@@ -373,11 +376,12 @@ public class Player : NetworkBehaviour
         isMapMode = enteringMapMode;
 
         // RPC로 전체 클라이언트에게 반영
-        ApplyViewMapModeLocal(enteringMapMode);
+        RPC_ApplyViewMapModeLocal(enteringMapMode);
 
     }
     
-    private void ApplyViewMapModeLocal(bool entering)
+    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+    private void RPC_ApplyViewMapModeLocal(bool entering)
     {
         if (entering)
         {

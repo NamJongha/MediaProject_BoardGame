@@ -6,7 +6,6 @@ using Fusion;
 
 public class PlayerUIManager : NetworkBehaviour
 {
-    private GameObject mainCanvas;
     private Player player;
     
     [SerializeField] private Button playerButtonPrefab;
@@ -22,7 +21,6 @@ public class PlayerUIManager : NetworkBehaviour
         base.Spawned();
         InstantiateButtons();
         
-        mainCanvas = GameObject.Find("Canvas");
         player = this.gameObject.GetComponent<Player>();
     }
 
@@ -76,6 +74,9 @@ public class PlayerUIManager : NetworkBehaviour
 
             //Add events on button
             endTurnButtonInstance.onClick.AddListener(OnEndTurnButtonClicked);
+            diceRollButtonInstance.onClick.AddListener(OnClickRollDice);
+            useItemButtonInstance.onClick.AddListener(OnClickUseItem);
+            viewMapButtonInstance.onClick.AddListener(OnClickViewMap);
             closeMapButtonInstance.onClick.AddListener(OnClickCloseMap);
 
             //Initialize state
@@ -108,13 +109,13 @@ public class PlayerUIManager : NetworkBehaviour
         viewMapButtonInstance.gameObject.SetActive(visible);
     }
     
-    private void OnClickCloseMap()
-    {
-        if (player != null && player.Object.HasInputAuthority)
-        {
-            player.RequestControlMap();
-        }
-    }
+    //private void OnClickCloseMap()
+    //{
+    //    if (player != null && player.Object.HasInputAuthority)
+    //    {
+    //        player.RequestControlMap();
+    //    }
+    //}
     
     public void EnterMapViewUI()
     {
@@ -131,6 +132,7 @@ public class PlayerUIManager : NetworkBehaviour
         // 턴 버튼 복귀
         SetTurnButtonsVisible(true);
     }
+    
     #region ButtonEvents
     //End Turn Button
     private void OnEndTurnButtonClicked()
@@ -150,6 +152,52 @@ public class PlayerUIManager : NetworkBehaviour
         Debug.Assert(TurnManager.Instance != null);
 
         TurnManager.Instance.OnPlayerEndTurn(Object.InputAuthority); //this is for managing turn state in turnManager
+    }
+    
+    private void OnClickRollDice()
+    {
+        LogManager.Instance.Log("Roll Dice Button Click detected");
+        Player current = TurnManager.Instance.GetCurrentTurnPlayer();
+        Debug.Log($"Current Player : {current.playerName}");
+        if (current != null)
+        {
+            LogManager.Instance.Log("Roll Dice");
+            current.OnDiceRollButtonClicked();
+        }
+    }
+
+    private void OnClickUseItem()
+    {
+        LogManager.Instance.Log("Use Item Button Click detected");
+
+        var current = TurnManager.Instance.GetCurrentTurnPlayer();
+        if (current != null)
+        {
+            //debugging item
+            ItemUIManager.Instance.ShowItemList(current);
+        }
+    }
+    
+    private void OnClickViewMap()
+    {
+        LogManager.Instance.Log("View Map Button Click detected");
+
+        var current = TurnManager.Instance.GetCurrentTurnPlayer();
+        if (current != null)
+        {
+            current.OnMapControlButtonClicked();
+        }
+    }
+    
+    private void OnClickCloseMap()
+    {
+        LogManager.Instance.Log("Close Map Button Click detected");
+
+        var current = TurnManager.Instance.GetCurrentTurnPlayer();
+        if (current != null)
+        {
+            current.OnMapControlButtonClicked();
+        }
     }
     #endregion
 }

@@ -155,7 +155,18 @@ public class GameManager : MonoBehaviour, INetworkRunnerCallbacks
 
     public Dictionary<PlayerRef, NetworkObject> GetPlayersList()
     {
-        return _spawnedCharacters;
+        Dictionary<PlayerRef, NetworkObject> dic = new Dictionary<PlayerRef, NetworkObject>();
+
+        foreach (PlayerRef playerRef in _runner.ActivePlayers)
+        {
+            NetworkObject playerObject = _runner.GetPlayerObject(playerRef);
+            if (playerObject)
+            {
+                dic[playerRef] = playerObject;
+            }
+        }
+
+        return dic;
     }
 
     private IEnumerator RespawnAllPlayersAfterBoardReady(NetworkRunner runner)
