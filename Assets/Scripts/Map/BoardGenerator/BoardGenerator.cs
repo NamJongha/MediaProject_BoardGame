@@ -52,9 +52,6 @@ public class BoardGenerator : MonoBehaviour
     private BoardNode goalNode;
     
     public static BoardGenerator Instance { get; private set; }
-    private void Start()
-    {
-    }
     
     private void Awake()
     {
@@ -75,8 +72,6 @@ public class BoardGenerator : MonoBehaviour
     }
     public void GenerateBoard(int seed)
     {
-        Debug.Log($"[BoardGenerator] GenerateBoard(seed={seed})");
-
         UnityEngine.Random.InitState(seed);
 
         ClearBoard();
@@ -84,18 +79,20 @@ public class BoardGenerator : MonoBehaviour
 
         var tileSize = GetTileSize(defaultNodePrefab);
 
-        // 메인 경로 + 브랜치 생성
         pathGenerator.GenerateMainPath(this, allNodes, tileSize);
 
-        StartCoroutine(pathGenerator.GenerateBranches(this, allNodes, tileSize));
-                
-        // Goal 노드 추가
+        pathGenerator.GenerateBranchesSync(this, allNodes, tileSize); // 코루틴 제거된 버전 필요
+
         CreateGoalNode();
+
+        specialTileGenerator.GenerateSpecialTiles(this);
+
+        allNodes = tileParent.GetComponentsInChildren<BoardNode>().ToList();
         
-        // 브랜치 생성 코루틴이 끝나도록 약간 기다렸다가 특수 타일 생성
-        StartCoroutine(WaitAndGenerateSpecialTiles());
+        allNodes.RemoveAll(n => n == null);
         
         CollectSpawnNodes();
+        
         OnBoardGenerated?.Invoke();
     }
 

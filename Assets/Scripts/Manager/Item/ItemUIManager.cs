@@ -43,44 +43,78 @@ public class ItemUIManager : MonoBehaviour
         currentOwner = ownerPlayer;  // UI 주인 저장
         //this.ownerRef = ownerRef;    // LocalPlayer와 비교할 때 사용
         currentPlayer = ownerPlayer; // UpdateItemListUI()에서 사용하는 값
+        
+        if (ownerPlayer == null)
+        {
+            Debug.LogError("[ItemUI] ownerPlayer is NULL!");
+            return;
+        }
+
+        var list = ownerPlayer.GetItemList();
+        if (list == null)
+        {
+            Debug.LogError("[ItemUI] ownerPlayer.Items is NULL!");
+            return;
+        }
+        
         UpdateItemListUI();
         //RefreshButtons(ownerPlayer);
     }
 
     public void UpdateItemListUI()
     {
-        List<IItemStrategy> playerItemList = currentPlayer.GetItemList();
+        if (currentPlayer == null)
+        {
+            Debug.LogError("[ItemUI] currentPlayer is NULL !!!");
+            return;
+        }
 
+        // 1) 원본 리스트 가져오기
+        var rawList = currentPlayer.GetItemList();
+
+        // 2) null 제거된 안전 리스트 생성
+        List<IItemStrategy> safeList = rawList.FindAll(item => item != null);
+
+        // 3) 모든 버튼 비활성화
         foreach (var b in itemButtons)
             b.gameObject.SetActive(false);
 
-        if (playerItemList.Count == 0)
+        // 4) 아이템이 없으면 메시지 표시
+        if (safeList.Count == 0)
         {
-            // 아이템 없음 표시 (임시 버튼 재활용 or 텍스트)
             noItemText.gameObject.SetActive(true);
-            noItemText.text = "사용 가능한 아이템이 없습니다";
+            noItemText.text = "No Item";
             return;
         }
 
         noItemText.gameObject.SetActive(false);
-        
+
+        // 5) 버튼 갱신
         for (int i = 0; i < itemButtons.Length; i++)
         {
-            if (i >= playerItemList.Count)
+            if (i >= safeList.Count)
             {
                 itemButtons[i].gameObject.SetActive(false);
                 continue;
             }
-            
-            Sprite ItemImage = playerItemList[i].GetItemSprite();
-            itemButtons[i].GetComponent<Image>().sprite = ItemImage;
+
+            var item = safeList[i];
+            Sprite ItemImage = item.GetItemSprite();
+
+            var img = itemButtons[i].GetComponentInChildren<Image>(true);
+            if (img != null)
+                img.sprite = ItemImage;
+
             itemButtons[i].gameObject.SetActive(true);
+
             itemButtons[i].onClick.RemoveAllListeners();
-            
-            int index = i;
-            itemButtons[i].onClick.AddListener(() => OnItemButtonClicked(playerItemList[index]));
+            itemButtons[i].onClick.AddListener(() =>
+            {
+                OnItemButtonClicked(item);
+            });
         }
     }
+
 
     private void OnItemButtonClicked(IItemStrategy item)
     {

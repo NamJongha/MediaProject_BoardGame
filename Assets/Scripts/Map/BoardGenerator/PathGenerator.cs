@@ -66,20 +66,19 @@ public class PathGenerator : MonoBehaviour
     // =======================================================================
     //  브랜치 생성 — 이전 브랜치 종착점 기준 4~5칸 뒤 시작
     // =======================================================================
-    public IEnumerator GenerateBranches(BoardGenerator board, List<BoardNode> allNodes, float tileSize)
+    public void GenerateBranchesSync(BoardGenerator board, List<BoardNode> allNodes, float tileSize)
     {
-        yield return null;
-
         int total = allNodes.Count;
-        if (total < 20) yield break;
+        if (total < 20)
+            return;
 
-        Debug.Log($"[2PASS] 브랜치 생성 시작 (총 {total} 노드)");
+        Debug.Log($"[2PASS:SYNC] 브랜치 생성 시작 (총 {total} 노드)");
 
-        int nextAvailableStartIndex = 4;    // 처음에는 4번째 노드부터 가능
+        int nextAvailableStartIndex = 4;
 
         for (int i = 4; i < total - 12; i++)
         {
-            // 다음 브랜치를 시작할 수 있는 최소 인덱스 조건
+            // 다음 브랜치를 시작할 수 있는 최소 인덱스
             if (i < nextAvailableStartIndex)
                 continue;
 
@@ -93,35 +92,31 @@ public class PathGenerator : MonoBehaviour
             int targetIndex = Mathf.Min(total - 1, i + Random.Range(5, 11));
             BoardNode targetNode = allNodes[targetIndex];
 
-            Debug.Log($"[Branch] {i} → {targetIndex}");
+            Debug.Log($"[Branch:SYNC] {i} → {targetIndex}");
 
-            // 브랜치 생성 실행
-            StartCoroutine(CreateBranchArc(board, allNodes, startNode, targetNode, tileSize));
+            // 동기화된 ARC 브랜치 생성
+            CreateBranchArcSync(board, allNodes, startNode, targetNode, tileSize);
 
-            // ★ 다음 브랜치 가능 시작점 = 이 브랜치 endIndex + (4~5)
+            // 다음 브랜치 가능 시작점
             nextAvailableStartIndex = targetIndex + Random.Range(4, 6);
-
-            yield return null;
         }
 
-        Debug.Log("[2PASS] 브랜치 생성 완료");
+        Debug.Log("[2PASS:SYNC] 브랜치 생성 완료");
     }
 
 
-    // =======================================================================
-    //  ARC 베지어 브랜치 생성
-    // =======================================================================
-    private IEnumerator CreateBranchArc(BoardGenerator board, List<BoardNode> allNodes,
+// =======================================================================
+//  ARC 베지어 브랜치 생성 (완전 동기 버전)
+// =======================================================================
+    private void CreateBranchArcSync(BoardGenerator board, List<BoardNode> allNodes,
         BoardNode startNode, BoardNode endNode, float tileSize)
     {
-        yield return null;
-
         Vector3 A = startNode.transform.position;
         Vector3 B = endNode.transform.position;
 
         float dist = Vector3.Distance(A, B);
         if (dist < tileSize * 3f)
-            yield break;
+            return;
 
         Vector3 dir = (B - A).normalized;
         Vector3 right = Vector3.Cross(Vector3.up, dir);
@@ -148,7 +143,7 @@ public class PathGenerator : MonoBehaviour
             TerrainType terrain = board.GetRegionByPosition(pos);
             GameObject prefab = board.GetTilePrefab(terrain) ?? board.defaultNodePrefab;
 
-            GameObject tile = Instantiate(prefab, pos, Quaternion.identity, board.tileParent);
+            GameObject tile = GameObject.Instantiate(prefab, pos, Quaternion.identity, board.tileParent);
             BoardNode node = tile.GetComponent<BoardNode>() ?? tile.AddComponent<BoardNode>();
 
             node.id = allNodes.Count;

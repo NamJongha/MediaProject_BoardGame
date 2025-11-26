@@ -168,14 +168,23 @@ public class PlayerUIManager : NetworkBehaviour
 
     private void OnClickUseItem()
     {
+        SetTurnButtonsVisible(false);
         LogManager.Instance.Log("Use Item Button Click detected");
 
-        var current = TurnManager.Instance.GetCurrentTurnPlayer();
-        if (current != null)
+        if (player == null)
+            return;
+
+        if (!player.Object.HasInputAuthority)
+            return;
+
+        // Player 초기화 완료됐는지 확인
+        if (!player.isInitialized)
         {
-            //debugging item
-            ItemUIManager.Instance.ShowItemList(current);
+            Debug.LogWarning("[ItemUI] Player not initialized yet. Can't open item UI.");
+            return;
         }
+
+        ItemUIManager.Instance.ShowItemList(player);
     }
     
     private void OnClickViewMap()
