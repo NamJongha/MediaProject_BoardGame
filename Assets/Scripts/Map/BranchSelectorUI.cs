@@ -63,37 +63,4 @@ public class BranchSelectorUI : MonoBehaviour
         player.RPC_ChooseBranch(index);
         panel.SetActive(false);
     }
-
-    public BoardNode GetChosenNode(Player player)
-    {
-        if (!player.Object.HasStateAuthority)
-        {
-            Debug.LogError("[BranchSelectorUI] GetChosenNode는 반드시 StateAuthority(Host)에서 호출해야 합니다.");
-            return null;
-        }
-
-        if (!playerBranches.ContainsKey(player))
-        {
-            Debug.LogError("[BranchSelectorUI] 해당 플레이어에 대한 branch 목록이 없습니다!");
-            return null;
-        }
-
-        List<BoardNode> branches = playerBranches[player];
-
-        if (branches == null || branches.Count == 0)
-        {
-            Debug.LogError("[BranchSelectorUI] branches 리스트가 비어 있습니다.");
-            return null;
-        }
-
-        int index = player.chosenBranchIndex;
-        if (index < 0 || index >= branches.Count)
-        {
-            Debug.LogError("[BranchSelectorUI] Branch 선택 인덱스가 범위를 벗어남!");
-            return null;
-        }
-
-        Debug.Log($"[BranchSelectorUI] Host에서 {player} → Branch {index} 선택 확정됨.");
-        return branches[index];
-    }
 }

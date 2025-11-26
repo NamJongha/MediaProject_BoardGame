@@ -98,13 +98,30 @@ public class PlayerMover : NetworkBehaviour
 
             bool nextIsGoal = finalNode.nextNodes.Exists(n => n != null && n.nodeType == NodeType.Goal);
             
-            // branch + goal 우선 처리
+            BoardNode nextNode;
+
+            // 갈림길인 경우에만 플레이어에게 선택권 부여
             if (finalNode.nextNodes.Count > 1 && !nextIsGoal)
             {
-                    yield return StartCoroutine(ChoosePath(finalNode, player));
-            }
+                // 선택 UI + RPC 대기
+                yield return StartCoroutine(ChoosePath(finalNode, player));
 
-            BoardNode nextNode = finalNode.nextNodes[0];
+                // 서버에서 결정된 chosenBranchIndex 사용
+                int index = player.chosenBranchIndex;
+                if (index < 0 || index >= finalNode.nextNodes.Count)
+                {
+                    Debug.LogError($"[PlayerMover] invalid chosenBranchIndex {index} at node {finalNode.id}");
+                    yield break;
+                }
+
+                nextNode = finalNode.nextNodes[index];
+            }
+            else
+            {
+                // 갈림길이 아니면 첫 번째 노드로 진행
+                nextNode = finalNode.nextNodes[0];
+            }
+            
             yield return StartCoroutine(MoveToNode(nextNode, false));
             finalNode = nextNode;
         }
@@ -137,41 +154,40 @@ public class PlayerMover : NetworkBehaviour
         isMoving = false;
     }
 
-
     private IEnumerator ChoosePath(BoardNode node, Player player)
     {
         if (branchSelectorUI == null)
         {
-            Debug.LogError("[PlayerMover] branchSelectorUI is null! Make sure BranchSelectorUI exists in the scene.");
+            Debug.LogError("[PlayerMover] branchSelectorUI is null!");
             yield break;
         }
 
         if (node.nextNodes == null || node.nextNodes.Count == 0)
         {
-            Debug.LogWarning("[PlayerMover] No branches to choose from. Skipping branch selection.");
+            Debug.LogWarning("[PlayerMover] No branches found.");
             yield break;
         }
 
-        // InputAuthority만 UI 띄운다
-        branchSelectorUI.Show(node.nextNodes, player);
+        // (1) 서버(StateAuthority) → 지금 턴인 플레이어(InputAuthority)에게 "UI 열어라" RPC 전달
+        if (Object.HasStateAuthority)
+        {
+            int[] branchIds = node.nextNodes
+                .Where(n => n != null)
+                .Select(n => n.id)
+                .ToArray();
 
-        // Host(StateAuthority)가 branchSelected = true 로 변경할 때까지 대기
+            player.RPC_OpenBranchSelector(branchIds);
+        }
+
+        // (2) 클라이언트는 UI에서 버튼 클릭 → RPC_ChooseBranch(index) 실행
         while (!player.branchSelected)
             yield return null;
 
-        BoardNode chosen = branchSelectorUI.GetChosenNode(player);
-
-        if (chosen == null)
+        // (3) 서버가 최종 선택 확정
+        if (Object.HasStateAuthority)
         {
-            Debug.LogError("[PlayerMover] chosen branch is null.");
-            yield break;
+            player.branchSelected = false;
         }
-
-        node.nextNodes.Clear();
-        
-        node.nextNodes.Add(chosen);
-
-        player.branchSelected = false;
     }
 
     

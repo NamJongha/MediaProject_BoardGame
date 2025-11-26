@@ -24,10 +24,13 @@ public class GameManager : MonoBehaviour, INetworkRunnerCallbacks
     private TurnManager _turnManager;
 
     private bool boardReady;
+    [SerializeField] private NetworkPrefabRef boardSeedPrefab;
+    private BoardSeedNetworkObj seedObj;
     private int boardSeed = -1;
     
     [SerializeField] private GameObject gameOverPanelPrefab;
     private GameOverPanel gameOverPanelInstance;
+    
     public static GameManager Instance { get; private set; }
 
     public NetworkPrefabRef PlayerPrefab => _playerPrefab;
@@ -46,6 +49,22 @@ public class GameManager : MonoBehaviour, INetworkRunnerCallbacks
         BoardGenerator.OnBoardGenerated += OnBoardReady;
     }
 
+    private void Update()
+    {
+        if (_runner != null)
+        {
+            Debug.Log($"[Lobby] Runner InstanceID = {_runner.GetInstanceID()}");
+            Debug.Log($"[Lobby] Runner Player Count = {_runner.ActivePlayers.Count()}");
+
+            int i = 0;
+            foreach (var p in _runner.ActivePlayers)
+            {
+                Debug.Log($"[Lobby] Player[{i}] PlayerId={p.PlayerId}");
+                i++;
+            }
+        }
+    }
+
     private void Start()
     {
         if (FindFirstObjectByType<NetworkRunner>() != null) return;
@@ -61,18 +80,17 @@ public class GameManager : MonoBehaviour, INetworkRunnerCallbacks
         // GAMETEST에서만 동작
         if (curScene == "GAMETEST")
         {
-            // 1) 보드 생성 (Host에서 Seed 전달)
             if (runner.IsServer)
             {
-                var seed = Random.Range(0, 999999);
-                Debug.Log($"[Host] Generated Seed = {seed}");
-                RPC_SendBoardSeed(seed);
+                SpawnAndSetSeed(runner);   // Host가 Seed 생성 & 저장
             }
+            
+            StartCoroutine(WaitSeedObjectAndGenerateBoard());
 
-            // 2) 모든 플레이어 리스폰 코루틴 시작
+            // 모든 플레이어 리스폰 코루틴 시작
             StartCoroutine(RespawnAllPlayersAfterBoardReady(runner));
 
-            // 3) TurnManager는 여기서 생성 (중복 방지)
+            // TurnManager는 여기서 생성 (중복 방지)
             StartCoroutine(SpawnTurnManagerAfterRunnerReady());
         }
     }
@@ -91,6 +109,8 @@ public class GameManager : MonoBehaviour, INetworkRunnerCallbacks
             PlayerPrefs.Save();
             spawnPoints = GameObject.FindGameObjectsWithTag("SpawnPoint").OrderBy(spawnPoint => spawnPoint.name)
                 .ToArray();
+            StartCoroutine(RespawnPlayersInLobby());
+            
             StartCoroutine(StartAfterLoad());
         }
         else if (scene.name == "GAMETEST")
@@ -119,7 +139,10 @@ public class GameManager : MonoBehaviour, INetworkRunnerCallbacks
         }
         else if (curSceneName == "GAMETEST")
         {
-            _runner.Spawn(turnManagerPrefab);
+            if (_runner != null && _runner.IsServer)   // 서버(Host)일 때만
+            {
+                _runner.Spawn(turnManagerPrefab);
+            }
         }
     }
 
@@ -155,8 +178,83 @@ public class GameManager : MonoBehaviour, INetworkRunnerCallbacks
 
     public Dictionary<PlayerRef, NetworkObject> GetPlayersList()
     {
-        return _spawnedCharacters;
+        Dictionary<PlayerRef, NetworkObject> dic = new Dictionary<PlayerRef, NetworkObject>();
+
+        foreach (PlayerRef playerRef in _runner.ActivePlayers)
+        {
+            NetworkObject playerObject = _runner.GetPlayerObject(playerRef);
+            if (playerObject)
+            {
+                dic[playerRef] = playerObject;
+            }
+        }
+
+        return dic;
     }
+    
+    private IEnumerator RespawnPlayersInLobby()
+    {
+        while (_runner == null)
+            yield return null;
+
+        while (spawnPoints == null || spawnPoints.Length == 0)
+            yield return null;
+
+        Debug.Log("[GM] LobbyScene: Respawning players...");
+
+        _spawnedCharacters.Clear();
+        if (_runner.IsServer) // Host만 스폰
+        {
+            foreach (var player in _runner.ActivePlayers)
+            {
+                int idx = Mathf.Clamp(player.PlayerId - 1, 0, spawnPoints.Length - 1);
+
+                Vector3 pos = spawnPoints[idx].transform.position + new Vector3(0, 2.5f, 0);
+                var newObj = _runner.Spawn(_playerPrefab, pos, Quaternion.identity, player);
+
+                _runner.SetPlayerObject(player, newObj);
+                _spawnedCharacters[player] = newObj;
+
+                Debug.Log($"[GM] LobbyScene: Player {player.PlayerId} respawned.");
+            }
+        }
+    }
+
+    
+    private void SpawnAndSetSeed(NetworkRunner runner)
+    {
+        int seed = UnityEngine.Random.Range(0, 999999);
+        Debug.Log($"[Host] Generated Seed = {seed}");
+
+        NetworkObject no = runner.Spawn(boardSeedPrefab);
+        seedObj = no.GetComponent<BoardSeedNetworkObj>();
+        seedObj.Seed = seed;                      // Networked 변수로 동기화됨
+    }
+    
+    private IEnumerator WaitSeedObjectAndGenerateBoard()
+    {
+        while (BoardGenerator.Instance == null)
+            yield return null;
+
+        BoardSeedNetworkObj seedObj = null;
+
+        while (seedObj == null)
+        {
+            seedObj = FindAnyObjectByType<BoardSeedNetworkObj>();
+            yield return null;
+        }
+
+        while (seedObj.Seed == 0)
+            yield return null;
+
+        Debug.Log("[GM] Seed received = " + seedObj.Seed);
+
+        // HOST와 CLIENT 둘 다 동일 seed로 generate
+        BoardGenerator.Instance.GenerateBoard(seedObj.Seed);
+
+        boardReady = true;
+    }
+
 
     private IEnumerator RespawnAllPlayersAfterBoardReady(NetworkRunner runner)
     {
@@ -177,7 +275,6 @@ public class GameManager : MonoBehaviour, INetworkRunnerCallbacks
 
         Debug.Log($"[GM] Board ready, respawning players. SpawnPoints={spawnPoints.Length}");
         
-        //내가 카페에서 이미 등록되어있는거에서 꺼내온다 했었는데, 내 로컬 코드 보니까 그냥 이걸 지우고 다시 씌우더라;;
         _spawnedCharacters.Clear();
         
         var startNode = BoardGenerator.Instance.GetStartNode();
@@ -192,27 +289,29 @@ public class GameManager : MonoBehaviour, INetworkRunnerCallbacks
             var index = Mathf.Clamp(player.PlayerId - 1, 0, spawnPoints.Length - 1);
             //y offset을 주어서 날아가는 것 방지
             var pos = spawnPoints[player.PlayerId - 1].transform.position + new Vector3(0, 2.5f, 0);
-            
-            // 새로 스폰
-            var newObj = _runner.Spawn(_playerPrefab, pos, Quaternion.identity, player);
-            
-            // 이부분 _spawnedCharacters[player] = newObj;로 되어있음
-            // => 씬이 바뀔 때 기존 오브젝트가 디스폰되는데, Runner에 등록된 플레이어와 오브젝트 쌍은 변하지 않으면 문제 있을 수 있음
-            runner.SetPlayerObject(player, newObj);
-            _spawnedCharacters.Add(player, newObj);
-            
-            var playerScript = newObj.GetComponent<Player>();
-            if (playerScript != null)
+            if (runner.IsServer)
             {
-                playerScript.currentNodeId = startNode.id;
-                Debug.Log($"Player {player.PlayerId} currentNode initialized to: {startNode.name}");
-            }
-            else
-            {
-                Debug.LogError($"Player script not found on player {player.PlayerId}");
-            }
+                // 새로 스폰
+                var newObj = _runner.Spawn(_playerPrefab, pos, Quaternion.identity, player);
 
-            Debug.Log($"Respawned Player {player.PlayerId} at {pos}");
+                // 이부분 _spawnedCharacters[player] = newObj;로 되어있음
+                // => 씬이 바뀔 때 기존 오브젝트가 디스폰되는데, Runner에 등록된 플레이어와 오브젝트 쌍은 변하지 않으면 문제 있을 수 있음
+                runner.SetPlayerObject(player, newObj);
+                _spawnedCharacters.Add(player, newObj);
+
+                var playerScript = newObj.GetComponent<Player>();
+                if (playerScript != null)
+                {
+                    playerScript.currentNodeId = startNode.id;
+                    Debug.Log($"Player {player.PlayerId} currentNode initialized to: {startNode.name}");
+                }
+                else
+                {
+                    Debug.LogError($"Player script not found on player {player.PlayerId}");
+                }
+
+                Debug.Log($"Respawned Player {player.PlayerId} at {pos}");
+            }
         }
     }
 
@@ -242,18 +341,12 @@ public class GameManager : MonoBehaviour, INetworkRunnerCallbacks
 
     private void OnBoardReady()
     {
+        if (BoardGenerator.Instance == null)
+        {
+            Debug.LogError("[GM] BoardGenerator.Instance is NULL in OnBoardReady()");
+            return;
+        }
         boardReady = true;
-        Debug.Log("[GM] Board ready.");
-    }
-    
-    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
-    public void RPC_SendBoardSeed(int seed)
-    {
-        boardSeed = seed;
-        Debug.Log($"[RPC] Seed Received: {seed}");
-
-        // Seed를 받으면 즉시 보드 생성
-        BoardGenerator.Instance.GenerateBoard(seed);
     }
     
     public void RegisterTurnManager(TurnManager tm)
@@ -399,6 +492,8 @@ public class GameManager : MonoBehaviour, INetworkRunnerCallbacks
 
             networkPlayerObject.GetComponent<Player>().resetReady(); //reset joined player's ready state to false
 
+            runner.SetPlayerObject(player, networkPlayerObject);
+            
             // Keep track of the player avatars for easy access
             _spawnedCharacters.Add(player, networkPlayerObject);
         }

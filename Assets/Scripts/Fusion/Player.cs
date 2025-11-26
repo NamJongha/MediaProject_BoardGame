@@ -43,6 +43,8 @@ public class Player : NetworkBehaviour
 
     private bool isMapMode = false;
     
+    public bool isInitialized { get; private set; }
+    
     private void Awake()
     
     {
@@ -63,7 +65,6 @@ public class Player : NetworkBehaviour
             RPC_SetPlayerName(_playerName);
             turnManager = FindFirstObjectByType<TurnManager>();
             playerStamina = MaxStamina;
-
             LobbyManager lobby = FindFirstObjectByType<LobbyManager>();
             if (lobby != null)
             {
@@ -72,8 +73,7 @@ public class Player : NetworkBehaviour
                 lobby.UpdateButtonState();
             }
             
-
-            #region instantiate buttons
+            /*#region instantiate buttons
 
             endTurnButtonInstance = Instantiate(playerButtonPrefab);
 
@@ -124,15 +124,15 @@ public class Player : NetworkBehaviour
             viewMapButtonInstance.gameObject.SetActive(false);
             closeMapButtonInstance.gameObject.SetActive(false);
 
-            #endregion
-
+            #endregion*/
+            
             playerUIManager = gameObject.GetComponent<PlayerUIManager>();
+            itemUIManager = gameObject.GetComponent<ItemUIManager>();
             string currentScene = SceneManager.GetActiveScene().name;
-            if (Object.HasInputAuthority && currentScene == "GAMETEST")
-            {
-                RPC_InitAfterSceneLoad();
-            }
+            SceneManager.activeSceneChanged += OnSceneChanged;
         }
+        
+        isInitialized = true;
     }
 
     public override void Render()
@@ -214,6 +214,14 @@ public class Player : NetworkBehaviour
         turnManager.OnPlayerEndTurn(Object.InputAuthority); //this is for managing turn state in turnManager
     }
     
+    private void OnSceneChanged(Scene prev, Scene next)
+    {
+        if (Object.HasInputAuthority && next.name == "GAMETEST")
+        {
+            StartCoroutine(InitAfterSceneCoroutine());
+        }
+    }
+    
     [Rpc(RpcSources.InputAuthority, RpcTargets.All)]
     public void RPC_InitAfterSceneLoad()
     {
@@ -221,34 +229,27 @@ public class Player : NetworkBehaviour
 
         if (Object.HasInputAuthority)
         {
+            itemUIManager = FindFirstObjectByType<ItemUIManager>();
             playerUIManager = FindAnyObjectByType<PlayerUIManager>();
         }
     }
     
     private IEnumerator InitAfterSceneCoroutine()
     {
-        yield return new WaitForSeconds(0.3f);
+        // UI가 1프레임 뒤에 생성되므로 딜레이 필요
+        yield return null;
+        yield return new WaitForSeconds(0.1f);
 
-        Debug.Log("[Player] InitAfterSceneCoroutine starting...");
+        itemUIManager = FindFirstObjectByType<ItemUIManager>();
+        playerUIManager = FindAnyObjectByType<PlayerUIManager>();
 
-        // 예: ItemUIManager 자동 연결
         if (itemUIManager == null)
-        {
-            itemUIManager = FindFirstObjectByType<ItemUIManager>();
-            Debug.Log("[Player] ItemUIManager assigned automatically.");
-        }
-
-        // 예: PlayerUIManager 필요하면 추가
+            Debug.LogError("[Player] ItemUIManager 여전히 null!");
         if (playerUIManager == null)
-        {
-            playerUIManager = FindFirstObjectByType<PlayerUIManager>();
-            Debug.Log("[Player] PlayerUIManager assigned automatically.");
-        }
-
-        Debug.Log("[Player] InitAfterSceneCoroutine Finished!");
+            Debug.LogError("[Player] PlayerUIManager 여전히 null!");
     }
     
-    public void RequestRollDice()
+    public void OnDiceRollButtonClicked()
     {
         if (Object.HasInputAuthority)
         {
@@ -288,30 +289,32 @@ public class Player : NetworkBehaviour
         // Update Stamina Text and UI
         LogManager.Instance.Log($"{playerName} stamina is now {playerStamina}");
     }
-    public void RequestOpenItemUI()
-    {
-        if (!Object.HasInputAuthority) return;
-        if (!isPlayerTurn) return;
-        playerUIManager.SetTurnButtonsVisible(false);
-        RPC_OpenItemUI(Object.InputAuthority);
-    }
-    [Rpc(RpcSources.InputAuthority, RpcTargets.All)]
-    private void RPC_OpenItemUI(PlayerRef owner)
-    {
-        if (itemUIManager == null)
-            itemUIManager = FindFirstObjectByType<ItemUIManager>();
-
-        // UI 노출 (모든 클라이언트)
-        itemUIManager.ShowItemList(this, owner);
-    }
+    
+    //public void RequestOpenItemUI()
+    //{
+    //    if (!Object.HasInputAuthority) return;
+    //    if (!isPlayerTurn) return;
+    //    playerUIManager.SetTurnButtonsVisible(false);
+    //    RPC_OpenItemUI(Object.InputAuthority);
+    //}
+    //[Rpc(RpcSources.InputAuthority, RpcTargets.All)]
+    //private void RPC_OpenItemUI(PlayerRef owner)
+    //{
+    //    if (itemUIManager == null)
+    //        itemUIManager = FindFirstObjectByType<ItemUIManager>();
+//
+    //    // UI 노출 (모든 클라이언트)
+    //    itemUIManager.ShowItemList(this, owner);
+    //}
+    
     public void RequestUseItem(int index)
     {
         if (!Object.HasInputAuthority) return;
         if (!isPlayerTurn) return;
-
+//
         RPC_RequestUseItem(index);
     }
-
+//
     [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
     private void RPC_RequestUseItem(int index)
     {
@@ -320,27 +323,45 @@ public class Player : NetworkBehaviour
         {
             return;
         }
-
+//
         var item = list[index];
-
+//
         // 아이템 효과 실행
         item.UseItem(this);
-
+//
         // 인벤토리 삭제
         RemoveItem(item);
-
+//
         // UI 닫기
         RequestCloseItemUI();
     }
     
     public void RequestCloseItemUI()
     {
-        RPC_CloseItemUI();
+        if (Object.HasInputAuthority)
+        {
+            RPC_RequestCloseItemUI();   // 🆕 클라이언트 → 서버 요청
+            playerUIManager.SetTurnButtonsVisible(true);
+        }
+    }
+    [Rpc(RpcSources.InputAuthority, RpcTargets.StateAuthority)]
+    private void RPC_RequestCloseItemUI()
+    {
+        RPC_CloseItemUI();  // 🆕 서버가 실행 → 권한 OK
     }
     
     [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
     private void RPC_CloseItemUI()
     {
+        if (itemUIManager == null)
+        {
+            itemUIManager = FindAnyObjectByType<ItemUIManager>();
+            if (itemUIManager == null)
+            {
+                Debug.LogError("[Player] itemUIManager is STILL NULL in RPC_CloseItemUI()!");
+                return;
+            }
+        }
         itemUIManager.CloseUI();
         
         if (Object.HasInputAuthority)
@@ -349,7 +370,7 @@ public class Player : NetworkBehaviour
         }
     }
     
-    public void RequestControlMap()
+    public void OnMapControlButtonClicked()
     {
         if (Object.HasInputAuthority)
         {
@@ -357,6 +378,7 @@ public class Player : NetworkBehaviour
             {
                 RPC_RequestControlViewMap();
             }
+            CameraManager.Instance.SetIsLocalPlayerTurn(isPlayerTurn);
         }
     }
 
@@ -373,11 +395,12 @@ public class Player : NetworkBehaviour
         isMapMode = enteringMapMode;
 
         // RPC로 전체 클라이언트에게 반영
-        ApplyViewMapModeLocal(enteringMapMode);
+        RPC_ApplyViewMapModeLocal(enteringMapMode);
 
     }
     
-    private void ApplyViewMapModeLocal(bool entering)
+    [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
+    private void RPC_ApplyViewMapModeLocal(bool entering)
     {
         if (entering)
         {
@@ -557,6 +580,35 @@ public class Player : NetworkBehaviour
         chosenBranchIndex = index;
         branchSelected = true;
     }
+    
+    [Rpc(RpcSources.StateAuthority, RpcTargets.InputAuthority)]
+    public void RPC_OpenBranchSelector(int[] branchNodeIds)
+    {
+        // BoardNode id 리스트를 실제 노드 참조 리스트로 복원
+        var branches = new List<BoardNode>();
+        foreach (var id in branchNodeIds)
+        {
+            var node = BoardGenerator.Instance.GetNodeById(id);
+            if (node != null)
+                branches.Add(node);
+        }
+
+        if (branches.Count == 0)
+        {
+            Debug.LogError("[Player] RPC_OpenBranchSelector: no valid branches found.");
+            return;
+        }
+
+        if (BranchSelectorUI.Instance != null)
+        {
+            BranchSelectorUI.Instance.Show(branches, this);
+        }
+        else
+        {
+            Debug.LogError("[Player] RPC_OpenBranchSelector: BranchSelectorUI.Instance is null.");
+        }
+    }
+    
     [Rpc(RpcSources.StateAuthority, RpcTargets.All)]
     public void RPC_OnGameOver()
     {
@@ -567,4 +619,5 @@ public class Player : NetworkBehaviour
 
         isPlayerTurn = false;
     }
+    
 }
